@@ -1,16 +1,24 @@
 /**
  * Tiltway UI. Screens: home (chapters and levels), level, tutorial (first play; replayable), How
- * to play. Input: swipe anywhere on the board, the arrow pad under it, or the keyboard arrows.
- * Every tilt animates each piece along its real path; a tilt that moves nothing shakes the board
- * and costs nothing.
+ * to play. Input: swipe anywhere on the board (primary), the keyboard arrows, or optional
+ * direction buttons under the board ("Direction buttons" setting, Off by default). Every tilt
+ * animates each piece along its real path; a tilt that moves nothing shakes the board and costs
+ * nothing.
+ *
+ * Hints: FREE_HINTS_PER_LEVEL free per level. At zero the Hint button offers an optional
+ * rewarded ad (never shown automatically); a completed ad credits exactly one hint to the level it
+ * was requested on, which the player then uses with Hint. Ads: the native Google plugin in the
+ * Android app, a labelled simulation in the browser preview, none in a plain browser build.
  */
 import { DurableSave } from "../core/save.js";
 import { BRAND } from "../core/brand.js";
 import { focusForKeyboard, installFocusPolicy, markSeen, nativeCall, needsIntro, trackAppHeight } from "../core/platform.js";
+import { createAdsProvider } from "../core/ads.js";
+import { simulatedAdsEnabled, simulatedAdsProvider } from "./preview-ads.js";
 import { CHAPTERS, LEVELS } from "../engine/levels.js";
 import { hint as solverHint, isSolved, parseLayout, solvable, tilt } from "../engine/tilt.js";
 import { TUTORIAL_ROWS, TUTORIAL_STEPS } from "../engine/tutorial.js";
-import { hintsLeft, medalFor, PROGRESS_SPEC, recordResult, spendHint } from "../engine/progress.js";
+import { creditReward, FREE_HINTS_PER_LEVEL, hintsLeft, medalFor, PROGRESS_SPEC, recordResult, setPrefs, spendHint } from "../engine/progress.js";
 let storage = null;
 try {
     storage = window.localStorage;
@@ -18,7 +26,11 @@ try {
 catch {
     storage = null;
 }
-const save = new DurableSave(PROGRESS_SPEC, storage, nativeCall());
+const native = nativeCall();
+const save = new DurableSave(PROGRESS_SPEC, storage, native);
+const ads = createAdsProvider(native, "TiltwayAds") ?? (simulatedAdsEnabled() ? simulatedAdsProvider() : null);
+const adsMode = !ads ? "none" : globalThis.studioTestAds ? "test" : native ? "native" : "simulated";
+let adsState = { canRequestAds: false, privacyOptionsRequired: false };
 const app = document.getElementById("app");
 installFocusPolicy();
 trackAppHeight();
@@ -88,6 +100,7 @@ function renderHome() {
     screen.append(head, el("p", "lede", `Tilt the board. Drop every marble in its own hole. ${solved}/${LEVELS.length} solved.`));
     screen.append(button(solved ? "Continue" : "Play", "primary play-btn", () => go({ kind: "level", index: nextIndex() })));
     screen.append(button("How to play", "secondary help-btn", () => go({ kind: "help" })));
+    screen.append(dirButtonsSwitch());
     CHAPTERS.forEach((ch, ci) => {
         const sec = el("section", "chapter");
         sec.append(el("h2", "chapter-title", `${ci + 1}. ${ch.name}`));
@@ -110,9 +123,38 @@ function renderHome() {
 }
 function soundButton() {
     const b = button(progress().soundOn ? "Sound on" : "Sound off", "secondary sound-btn", () => {
-        void persist({ ...progress(), soundOn: !progress().soundOn }).then(() => (b.textContent = progress().soundOn ? "Sound on" : "Sound off"));
+        void persist(setPrefs(progress(), { soundOn: !progress().soundOn }));
+        b.textContent = progress().soundOn ? "Sound on" : "Sound off";
     });
     return b;
+}
+/**
+ * The "Direction buttons" setting (Off by default): an accessible switch on the level list and in
+ * How to play, so it never depends on the buttons themselves. Swiping and the keyboard always work.
+ */
+function dirButtonsSwitch(withNote = true) {
+    const box = el("div", "setting");
+    const sw = el("button", "switch dir-switch");
+    sw.type = "button";
+    sw.setAttribute("role", "switch");
+    sw.setAttribute("aria-label", "Direction buttons");
+    const state = el("span", "switch-state");
+    sw.append(el("span", "switch-label", "Direction buttons"), state);
+    const paintSwitch = () => {
+        const on = progress().dirButtons;
+        sw.setAttribute("aria-checked", String(on));
+        sw.classList.toggle("on", on);
+        state.textContent = on ? "On" : "Off";
+    };
+    sw.addEventListener("click", () => {
+        void persist(setPrefs(progress(), { dirButtons: !progress().dirButtons }));
+        paintSwitch();
+    });
+    paintSwitch();
+    box.append(sw);
+    if (withNote)
+        box.append(el("p", "setting-note", "Swipe on the board to tilt. Turn this on to also show ↑ ← → ↓ buttons under the board."));
+    return box;
 }
 // ------------------------------------------------------------------ help
 function renderHelp() {
@@ -122,17 +164,23 @@ function renderHelp() {
     screen.append(head);
     // Rules appear here once the player has met them (no spoilers); the rest is always shown.
     const seen = progress().seen;
+    const privacy = adsMode === "native"
+        ? "Tiltway stores your progress only on this device and has no accounts. Ads play only when you choose to watch one for a hint. They are provided by Google AdMob, which collects some device data (such as the advertising ID and IP address) when an ad is requested."
+        : adsMode === "simulated"
+            ? "Tiltway stores your progress only in this browser and has no accounts. In this preview, ads are simulated: no real ad is shown and nothing is sent anywhere."
+            : "Tiltway stores your progress only in this browser. It has no accounts, shows no ads here and sends nothing anywhere.";
     const entries = [
-        ["Tilt", "Swipe on the board (or use the arrows or your keyboard). Every loose piece rolls that way until it hits a wall or another piece.", null],
+        ["Tilt", "Swipe anywhere on the board: up, down, left or right. Every loose piece rolls that way until it hits a wall or another piece. Arrow keys on a keyboard work too.", null],
+        ["Direction buttons", "Prefer tapping? Turn on Direction buttons (below, or on the level list) to show ↑ ← → ↓ buttons under the board. They are off unless you turn them on.", null],
         ["Holes", "A marble drops into an empty hole of its own colour. It rolls straight over holes of other colours.", null],
         ["Crates", "Crates roll like marbles but never drop. Use them to stop a marble where you need it.", "crates"],
         ["Sticky pads", "Anything that rolls onto a sticky pad stops there. The next tilt rolls it off again.", "sticky"],
         ["Three colours", "Red circles, blue triangles and yellow squares: each marble needs the hole with its own colour and shape.", "colours"],
         ["Arrows", "Pieces can only roll onto an arrow tile in the direction it points. Rolling off is free.", "arrows"],
         ["Medals", "Gold: the fewest possible tilts without a hint. Silver: up to two tilts more. Bronze: any solve.", null],
-        ["Hints", "Each level has 3 hints. A hint shows the next tilt of a shortest solution from where you are. Hints never refill.", null],
+        ["Hints", `Each level has ${FREE_HINTS_PER_LEVEL} free hints. A hint shows the next tilt of a shortest solution from where you are. Used hints don't come back when you restart, replay or reopen the game. When a level has none left, you can choose to watch a short ad to earn 1 more hint for that level. Ads never play unless you ask.`, null],
         ["Undo and restart", "Both are free. A marble stuck in a corner it cannot leave? Undo.", null],
-        ["Privacy", "Tiltway stores your progress only on this device. It has no ads, no accounts and sends nothing anywhere.", null],
+        ["Privacy", privacy, null],
         ["About", `Tiltway is a ${BRAND.studio} game, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`, null],
     ];
     for (const [t, p, gate] of entries) {
@@ -140,6 +188,13 @@ function renderHelp() {
             continue;
         const s = el("section", "rule");
         s.append(el("h2", "", t), el("p", "", p));
+        if (t === "Direction buttons")
+            s.append(dirButtonsSwitch(false));
+        if (t === "Privacy" && ads && adsState.privacyOptionsRequired) {
+            s.append(button("Privacy choices", "secondary privacy-btn", () => {
+                void ads.showPrivacyOptions().then((st) => (adsState = st));
+            }));
+        }
         screen.append(s);
     }
     if (entries.some(([, , g]) => g && !seen.includes(g)))
@@ -175,9 +230,17 @@ function renderPlay(index) {
     const wrap = el("div", "board-wrap");
     const boardEl = el("div", "board");
     wrap.append(boardEl);
-    const pad = el("div", "pad");
-    for (const d of ["up", "left", "right", "down"])
-        pad.append(button(ARROW[d], `arrow arrow-${d}`, () => void doTilt(d), `Tilt ${d}`));
+    // Optional direction buttons: when the setting is Off the row is not built at all, so the board
+    // gets its space.
+    const pad = progress().dirButtons ? el("div", "pad") : null;
+    if (pad)
+        for (const d of ["up", "left", "right", "down"])
+            pad.append(button(ARROW[d], `arrow arrow-${d}`, () => void doTilt(d), `Tilt ${d}`));
+    // The hint is also drawn on the board itself, so it never depends on the buttons.
+    const hintMark = el("div", "hint-mark");
+    hintMark.setAttribute("aria-hidden", "true");
+    hintMark.hidden = true;
+    boardEl.append(hintMark);
     const actions = el("div", "actions");
     const undoBtn = button("Undo", "action-btn undo-btn", () => undo());
     const restartBtn = button("Restart", "action-btn restart-btn", () => restart());
@@ -187,7 +250,11 @@ function renderPlay(index) {
     message.setAttribute("role", "status");
     const winPanel = el("div", "win-panel");
     winPanel.hidden = true;
-    screen.append(head, info, coach, wrap, pad, actions, message, winPanel);
+    const adPanel = el("div", "ad-panel");
+    adPanel.setAttribute("role", "dialog");
+    adPanel.setAttribute("aria-labelledby", "ad-title");
+    adPanel.hidden = true;
+    screen.append(head, info, coach, wrap, ...(pad ? [pad] : []), actions, message, winPanel, adPanel);
     app.append(screen);
     // Cell size from the space actually available.
     let cell = 40;
@@ -265,10 +332,13 @@ function renderPlay(index) {
         restartBtn.disabled = !history.length || solved;
         const left = level ? hintsLeft(progress(), level.key) : 0;
         hintBtn.textContent = tutorial ? "Hint" : `Hint · ${left}`;
-        hintBtn.setAttribute("aria-label", tutorial ? "Hint" : `Hint, ${left} left`);
-        hintBtn.disabled = tutorial || solved;
-        if (tutorial)
+        hintBtn.setAttribute("aria-label", tutorial ? "Hint" : left ? `Hint, ${left} left` : "Hint, none left: you can watch an ad to earn one");
+        // The guided tutorial shows every move itself and never uses hints.
+        hintBtn.disabled = tutorial || solved || watching;
+        if (tutorial) {
             coach.textContent = step < TUTORIAL_STEPS.length ? TUTORIAL_STEPS[step].text : "";
+            coach.hidden = !coach.textContent;
+        }
     }
     async function doTilt(d) {
         if (busy || solved)
@@ -339,32 +409,119 @@ function renderPlay(index) {
         paint();
     }
     function showHint() {
-        if (!level || busy || solved)
+        if (!level || busy || solved || watching)
             return;
+        if (hintsLeft(progress(), level.key) <= 0) {
+            openAdOffer();
+            return;
+        }
         const d = solverHint(board);
         if (!d) {
             say("No solution from here. Undo or restart first.");
             return;
         }
         const spent = spendHint(progress(), level.key);
-        if (!spent) {
-            say("No hints left on this level.");
+        if (!spent)
             return;
-        }
         hintsUsedHere++;
         void persist(spent);
         clearHint();
-        pad.querySelector(`.arrow-${d}`)?.classList.add("is-hint");
+        pad?.querySelector(`.arrow-${d}`)?.classList.add("is-hint");
+        hintMark.className = `hint-mark to-${d}`;
+        hintMark.textContent = `${ARROW[d]} tilt ${d}`;
+        hintMark.hidden = false;
         say(`Hint: tilt ${d}.`);
         paint();
     }
-    const clearHint = () => pad.querySelectorAll(".is-hint").forEach((b) => b.classList.remove("is-hint"));
+    const clearHint = () => {
+        pad?.querySelectorAll(".is-hint").forEach((b) => b.classList.remove("is-hint"));
+        hintMark.hidden = true;
+    };
+    // ----- optional rewarded ad for one more hint (only when the player asks for it)
+    let watching = false;
+    let disposed = false;
+    function closeAdOffer() {
+        adPanel.hidden = true;
+        adPanel.replaceChildren();
+        paint();
+    }
+    function openAdOffer() {
+        if (!level || solved)
+            return;
+        const key = level.key;
+        adPanel.replaceChildren();
+        const h = el("h2", "ad-title", "No hints left on this level");
+        h.id = "ad-title";
+        const text = el("p", "ad-text", "Watch a short ad to earn 1 hint for this level. It's optional - you can keep playing without it.");
+        adPanel.append(h, text);
+        if (adsMode === "simulated")
+            adPanel.append(el("p", "ad-note", "Browser preview: the ad is simulated. No real ad is shown."));
+        if (adsMode === "none")
+            adPanel.append(el("p", "ad-note", "Ads aren't available in this browser version, so no hint can be earned here."));
+        const row = el("div", "ad-actions");
+        const watch = button("Watch an ad to earn 1 hint", "primary watch-btn", () => void watchAd());
+        const notNow = button("Not now", "secondary not-now-btn", () => {
+            if (!watching)
+                closeAdOffer();
+        });
+        row.append(watch, notNow);
+        adPanel.append(row);
+        adPanel.hidden = false;
+        say("");
+        paint();
+        focusForKeyboard(watch);
+        async function watchAd() {
+            if (watching)
+                return;
+            watching = true;
+            watch.disabled = true;
+            notNow.disabled = true;
+            text.textContent = "Loading an ad…";
+            paint();
+            const before = hintsLeft(progress(), key);
+            let status = "unavailable";
+            try {
+                if (ads) {
+                    // Ads are requested only once Google's consent check allows it.
+                    if (!adsState.canRequestAds)
+                        adsState = await ads.prepare(true);
+                    status = adsState.canRequestAds ? (await ads.showRewarded(key)).status : "consent";
+                    // Consent can change outside the game (privacy options): ask again next time.
+                    if (status === "consent")
+                        adsState = { ...adsState, canRequestAds: false };
+                }
+            }
+            catch {
+                status = "failed";
+            }
+            // Credit to the level the ad was requested on, even if the player left it meanwhile.
+            await claimRewards();
+            watching = false;
+            if (disposed)
+                return;
+            closeAdOffer();
+            if (hintsLeft(progress(), key) > before)
+                say("You earned 1 hint for this level. Tap Hint to use it.");
+            else if (status === "closed")
+                say("The ad was closed before the end, so no hint was earned. Keep playing as you like.");
+            // Offline before Google's consent check has ever run also reports "consent".
+            else if (status === "consent")
+                say("Ads can't be shown right now (they need a connection and ad consent). You can keep playing without a hint.");
+            else
+                say("No ad is available right now. You can keep playing without a hint.");
+            focusForKeyboard(hintBtn);
+        }
+    }
+    if (level)
+        onHintsChanged = () => paint();
     function win() {
+        if (!adPanel.hidden && !watching)
+            closeAdOffer();
         solved = true;
         paint();
         if (tutorial) {
             void persist({ ...progress(), seen: markSeen(progress().seen, "tutorial") });
-            winPanel.replaceChildren(el("h2", "", "That's it!"), el("p", "", "Tilt, roll, drop. Every level can be solved; aim for the fewest tilts."));
+            winPanel.replaceChildren(el("h2", "", "That's it!"), el("p", "", "Tilt, roll, drop. Every level can be solved; aim for the fewest tilts."), el("p", "tutorial-tip", "Prefer tapping to swiping? Turn on Direction buttons on the level list or in How to play."));
             winPanel.append(button("Start playing", "primary next-btn", () => go({ kind: "level", index: nextIndex() })));
         }
         else {
@@ -421,15 +578,49 @@ function renderPlay(index) {
     const ro = new ResizeObserver(() => layout());
     ro.observe(wrap);
     cleanup = () => {
+        disposed = true;
+        onHintsChanged = null;
         window.removeEventListener("keydown", onKey);
         ro.disconnect();
     };
     layout();
     paint();
     window.__tiltway = {
-        state: () => ({ moves, solved, step, busy, pieces: board.pieces.map((p) => ({ ...p })), holes: [...board.holes.keys()], w: board.w }),
+        state: () => ({ moves, solved, step, busy, watching, pieces: board.pieces.map((p) => ({ ...p })), holes: [...board.holes.keys()], w: board.w }),
     };
 }
+// ------------------------------------------------------------------ rewarded-ad credits
+let onHintsChanged = null;
+let claiming = Promise.resolve();
+/**
+ * Credit the rewards the ad provider recorded, each reward id once, to the level it was requested
+ * on; acknowledge them only after the save holding the credit has been written.
+ */
+function claimRewards() {
+    claiming = claiming.then(async () => {
+        if (!ads)
+            return;
+        try {
+            const pending = await ads.pendingRewards();
+            if (!pending.length)
+                return;
+            let p = progress();
+            for (const r of pending)
+                p = creditReward(p, r.id, r.context);
+            await persist(p);
+            await ads.ackRewards(pending.map((r) => r.id));
+            onHintsChanged?.();
+        }
+        catch {
+            // Left pending: claimed again on the next resume or launch.
+        }
+    });
+    return claiming;
+}
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden)
+        void claimRewards();
+});
 // ------------------------------------------------------------------ sound (tiny synthesized blip)
 let audio = null;
 function blip(freq) {
@@ -466,9 +657,18 @@ window.tiltwayHandleBack = () => {
     return true;
 };
 go(needsIntro(progress().seen, "tutorial") ? { kind: "tutorial" } : { kind: "home" });
-void save.restore().then((changed) => {
+// Merge the durable copy first, then credit any reward earned while the app was closed, then read
+// the ad-consent status (no form here: Google's form appears only if the player asks for an ad).
+void save
+    .restore()
+    .then((changed) => {
     if (changed && view.kind === "home")
         go({ kind: "home" });
     if (changed && view.kind === "tutorial" && !needsIntro(progress().seen, "tutorial"))
         go({ kind: "home" });
+})
+    .then(() => claimRewards())
+    .then(async () => {
+    if (ads)
+        adsState = await ads.prepare(false).catch(() => adsState);
 });

@@ -39,7 +39,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 .info-row { display: flex; justify-content: space-between; color: var(--dim); }
 .moves { font-size: 1.2rem; color: var(--ink); font-weight: 700; }
 .coach { background: var(--panel); border: 2px solid var(--accent); border-radius: 12px; padding: 10px 12px; font-weight: 600; }
-.board-wrap { flex: 1; min-height: 160px; display: grid; place-items: center; touch-action: none; user-select: none; }
+.board-wrap { position: relative; flex: 1; min-height: 160px; display: grid; place-items: center; touch-action: none; user-select: none; }
 .board { position: relative; display: grid; grid-template-columns: repeat(auto-fill, var(--cell)); grid-auto-rows: var(--cell); gap: var(--gap); }
 .cell { border-radius: 6px; display: grid; place-items: center; }
 .cell.wall { background: var(--wall); box-shadow: inset 0 0 0 2px #0f2029; }
@@ -92,3 +92,28 @@ button:disabled { opacity: 0.4; cursor: default; }
 .intro-glow { outline: 3px solid var(--accent); outline-offset: 2px; animation: glow 1s ease-in-out infinite alternate; }
 @keyframes glow { to { outline-color: #fff3; } }
 @media (prefers-reduced-motion: reduce) { .intro-glow { animation: none; } }
+/* Settings: the Direction buttons switch (level list and How to play). */
+.setting { display: grid; gap: 4px; }
+.switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--panel); color: var(--ink); border: 2px solid #33505e; text-align: left; }
+.switch-state { min-width: 3.2em; padding: 4px 10px; border-radius: 999px; background: #0c1820; color: var(--dim); text-align: center; }
+.switch.on .switch-state { background: var(--accent); color: #2a1406; }
+.setting-note { margin: 0; color: var(--dim); font-size: 0.9rem; }
+.rule .setting { margin-top: 8px; }
+.tutorial-tip { font-size: 0.9rem; }
+/* The hint, drawn on the board edge it points to (works with or without direction buttons). */
+.hint-mark { position: absolute; z-index: 2; pointer-events: none; padding: 4px 10px; border-radius: 999px; background: var(--accent); color: #2a1406; font-weight: 800; white-space: nowrap; box-shadow: 0 2px 8px #0008; animation: pulse 0.9s infinite; }
+.hint-mark.to-up { top: -6px; left: 50%; translate: -50% 0; }
+.hint-mark.to-down { bottom: -6px; left: 50%; translate: -50% 0; }
+.hint-mark.to-left { left: -6px; top: 50%; translate: 0 -50%; }
+.hint-mark.to-right { right: -6px; top: 50%; translate: 0 -50%; }
+/* Optional rewarded-ad offer (opened only from Hint at zero) and the preview's simulated ad. */
+.ad-panel { position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 528px; margin: 0 auto; z-index: 5; background: var(--panel); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: grid; gap: 10px; text-align: center; box-shadow: 0 10px 30px #0008; }
+.ad-panel h2 { margin: 0; }
+.ad-panel p { margin: 0; color: var(--dim); }
+.ad-panel .ad-note { color: var(--ink); font-size: 0.9rem; }
+.ad-actions { display: grid; gap: 8px; }
+.sim-ad { position: fixed; inset: 0; z-index: 200; background: #050b0f; color: var(--ink); display: grid; align-content: center; gap: 14px; padding: 24px; text-align: center; }
+.sim-ad h2 { margin: 0; }
+.sim-ad p { margin: 0; color: var(--dim); }
+.sim-ad-tag { justify-self: center; padding: 6px 12px; border-radius: 8px; background: #ff9f5a; color: #2a1406; font-weight: 800; letter-spacing: 0.08em; }
+@media (prefers-reduced-motion: reduce) { .hint-mark { animation: none; } }
