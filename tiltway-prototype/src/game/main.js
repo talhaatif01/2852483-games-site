@@ -5,6 +5,7 @@
  * and costs nothing.
  */
 import { DurableSave } from "../core/save.js";
+import { BRAND } from "../core/brand.js";
 import { focusForKeyboard, installFocusPolicy, markSeen, nativeCall, needsIntro, trackAppHeight } from "../core/platform.js";
 import { CHAPTERS, LEVELS } from "../engine/levels.js";
 import { hint as solverHint, isSolved, parseLayout, solvable, tilt } from "../engine/tilt.js";
@@ -115,6 +116,7 @@ function renderHelp() {
         ["Hints", "Each level has 3 hints. A hint shows the next tilt of a shortest solution from where you are. Hints never refill."],
         ["Undo and restart", "Both are free. A marble stuck in a corner it cannot leave? Undo."],
         ["Privacy", "Tiltway stores your progress only on this device. This prototype has no ads, no accounts and sends nothing anywhere."],
+        ["About", `Tiltway is a ${BRAND.studio} game prototype, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`],
     ]) {
         const s = el("section", "rule");
         s.append(el("h2", "", t), el("p", "", p));
