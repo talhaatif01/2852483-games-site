@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tiltway - prototype preview</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Tiltway: an unreleased game prototype by 2852483 Alberta Inc. Not a store release." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .proto-ribbon { position: fixed; top: 0; left: 0; right: 0; height: 24px; z-index: 100; display: flex; align-items: center; justify-content: center;
+      background: #ff9f5a; color: #2a1406; font: 700 12px/1 system-ui, sans-serif; letter-spacing: 0.06em; pointer-events: none; white-space: nowrap; overflow: hidden; }
+    body { padding-top: 24px; }
+    .screen { min-height: calc(var(--app-h, 100dvh) - 24px); }
+    .play-screen { height: calc(var(--app-h, 100dvh) - 24px); }
+  </style>
+</head>
+<body>
+  <div class="proto-ribbon" role="note">PROTOTYPE PREVIEW · unreleased game</div>
+  <div id="app" role="main"></div>
+  <script type="module" src="src/game/main.js"></script>
+</body>
+</html>
