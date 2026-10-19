@@ -34,7 +34,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 
 .play-screen { height: var(--app-h, 100dvh); overflow: hidden; }
 .titlebox { text-align: center; flex: 1; }
-.eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+.eyebrow { white-space: nowrap; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
 .level-name { font-weight: 700; font-size: 1.1rem; }
 .info-row { display: flex; justify-content: space-between; color: var(--dim); }
 .moves { font-size: 1.2rem; color: var(--ink); font-weight: 700; }
@@ -85,3 +85,10 @@ button:disabled { opacity: 0.4; cursor: default; }
 .medal-bronze { color: #d08a52; }
 @media (prefers-reduced-motion: reduce) { .piece { transition: none; } .board.shake, .arrow.is-hint { animation: none; } }
 @media (max-height: 640px) { .screen { gap: 8px; padding-top: 8px; } .pad { grid-template-rows: repeat(2, 44px); } .coach { padding: 6px 10px; } }
+/* Sticky pads and arrow tiles (chapters 4+). Shape, not only colour, tells them apart. */
+.cell.sticky .sticky-pad { width: 70%; height: 70%; border-radius: 30%; background: repeating-radial-gradient(circle, #7a5cc2 0 3px, #5d44a0 3px 6px); box-shadow: inset 0 0 0 2px #a48ae8; }
+.cell.arrow-tile { background: #2b5262; }
+.cell.arrow-tile .arrow-mark { font-size: calc(var(--cell) * 0.5); font-weight: 800; color: #9fe3f5; line-height: 1; }
+.intro-glow { outline: 3px solid var(--accent); outline-offset: 2px; animation: glow 1s ease-in-out infinite alternate; }
+@keyframes glow { to { outline-color: #fff3; } }
+@media (prefers-reduced-motion: reduce) { .intro-glow { animation: none; } }

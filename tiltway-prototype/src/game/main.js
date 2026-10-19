@@ -27,7 +27,12 @@ const MEDAL_LABEL = { gold: "Gold", silver: "Silver", bronze: "Bronze" };
 const RULE_CARDS = {
     pairs: { title: "Two marbles", text: "Every marble rolls at the same time. Each one needs a hole of its own colour, and it rolls straight over the others." },
     crates: { title: "Crates", text: "Crates roll too, but they never drop into a hole. Use them as stoppers." },
+    sticky: { title: "Sticky pads", text: "Anything that rolls onto a sticky pad stops there. The next tilt rolls it off again." },
+    colours: { title: "Three colours", text: "A third colour joins in. Every marble still needs a hole of its own colour, and shapes match too." },
+    arrows: { title: "Arrows", text: "Pieces can only roll onto an arrow tile in the direction it points. Rolling off is free." },
 };
+/** The board elements each rule card points at. */
+const RULE_GLOW = { pairs: ".piece.marble", crates: ".piece.crate", sticky: ".cell.sticky", colours: ".piece.color-c, .hole.color-c", arrows: ".cell.arrow-tile" };
 let view = { kind: "home" };
 let cleanup = null;
 const progress = () => save.value;
@@ -52,6 +57,13 @@ function go(next) {
     cleanup?.();
     cleanup = null;
     view = next;
+    // One history entry while away from the level list, so the system Back button (Android) and
+    // the browser's back return to the list instead of leaving the game.
+    if (next.kind !== "home" && history.state?.tiltway !== "away")
+        history.pushState({ tiltway: "away" }, "");
+    // Back to the list through the UI: drop the entry too (its popstate re-renders home: harmless).
+    if (next.kind === "home" && history.state?.tiltway === "away")
+        history.back();
     app.replaceChildren();
     if (next.kind === "home")
         renderHome();
@@ -108,20 +120,30 @@ function renderHelp() {
     const head = el("header", "top");
     head.append(button("‹ Back", "secondary back-btn", () => go({ kind: "home" })), el("h1", "title", "How to play"));
     screen.append(head);
-    for (const [t, p] of [
-        ["Tilt", "Swipe on the board (or use the arrows or your keyboard). Every loose piece rolls that way until it hits a wall or another piece."],
-        ["Holes", "A marble drops into an empty hole of its own colour. It rolls straight over holes of other colours."],
-        ["Crates", "Crates roll like marbles but never drop. Use them to stop a marble where you need it."],
-        ["Medals", "Gold: the fewest possible tilts without a hint. Silver: up to two tilts more. Bronze: any solve."],
-        ["Hints", "Each level has 3 hints. A hint shows the next tilt of a shortest solution from where you are. Hints never refill."],
-        ["Undo and restart", "Both are free. A marble stuck in a corner it cannot leave? Undo."],
-        ["Privacy", "Tiltway stores your progress only on this device. This prototype has no ads, no accounts and sends nothing anywhere."],
-        ["About", `Tiltway is a ${BRAND.studio} game prototype, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`],
-    ]) {
+    // Rules appear here once the player has met them (no spoilers); the rest is always shown.
+    const seen = progress().seen;
+    const entries = [
+        ["Tilt", "Swipe on the board (or use the arrows or your keyboard). Every loose piece rolls that way until it hits a wall or another piece.", null],
+        ["Holes", "A marble drops into an empty hole of its own colour. It rolls straight over holes of other colours.", null],
+        ["Crates", "Crates roll like marbles but never drop. Use them to stop a marble where you need it.", "crates"],
+        ["Sticky pads", "Anything that rolls onto a sticky pad stops there. The next tilt rolls it off again.", "sticky"],
+        ["Three colours", "Red circles, blue triangles and yellow squares: each marble needs the hole with its own colour and shape.", "colours"],
+        ["Arrows", "Pieces can only roll onto an arrow tile in the direction it points. Rolling off is free.", "arrows"],
+        ["Medals", "Gold: the fewest possible tilts without a hint. Silver: up to two tilts more. Bronze: any solve.", null],
+        ["Hints", "Each level has 3 hints. A hint shows the next tilt of a shortest solution from where you are. Hints never refill.", null],
+        ["Undo and restart", "Both are free. A marble stuck in a corner it cannot leave? Undo.", null],
+        ["Privacy", "Tiltway stores your progress only on this device. It has no ads, no accounts and sends nothing anywhere.", null],
+        ["About", `Tiltway is a ${BRAND.studio} game, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`, null],
+    ];
+    for (const [t, p, gate] of entries) {
+        if (gate && !seen.includes(gate))
+            continue;
         const s = el("section", "rule");
         s.append(el("h2", "", t), el("p", "", p));
         screen.append(s);
     }
+    if (entries.some(([, , g]) => g && !seen.includes(g)))
+        screen.append(el("p", "fineprint", "More rules appear as you play."));
     screen.append(button("Replay the tutorial", "primary cta", () => go({ kind: "tutorial" })));
     app.append(screen);
 }
@@ -167,17 +189,6 @@ function renderPlay(index) {
     winPanel.hidden = true;
     screen.append(head, info, coach, wrap, pad, actions, message, winPanel);
     app.append(screen);
-    // Rule card the first time a chapter's rule appears.
-    const rule = level ? CHAPTERS[level.chapter - 1].rule : null;
-    if (rule && RULE_CARDS[rule] && needsIntro(progress().seen, rule)) {
-        const card = el("div", "rule-card");
-        card.append(el("h2", "", RULE_CARDS[rule].title), el("p", "", RULE_CARDS[rule].text));
-        card.append(button("Got it", "primary got-it", () => {
-            card.remove();
-            void persist({ ...progress(), seen: markSeen(progress().seen, rule) });
-        }));
-        screen.append(card);
-    }
     // Cell size from the space actually available.
     let cell = 40;
     const layout = () => {
@@ -205,6 +216,15 @@ function renderPlay(index) {
             c.append(h);
             holeEls.set(i, h);
         }
+        const special = start.specials.get(i);
+        if (special === "sticky") {
+            c.classList.add("sticky");
+            c.append(el("div", "sticky-pad"));
+        }
+        else if (special) {
+            c.classList.add("arrow-tile", `to-${special}`);
+            c.append(el("div", "arrow-mark", ARROW[special]));
+        }
         boardEl.append(c);
     }
     for (const p of start.pieces) {
@@ -212,6 +232,20 @@ function renderPlay(index) {
         e.dataset.id = String(p.id);
         pieceEls.set(p.id, e);
         boardEl.append(e);
+    }
+    // Rule card the first time a chapter's rule appears, with the tiles it talks about glowing.
+    const rule = level ? CHAPTERS[level.chapter - 1].rule : null;
+    if (rule && RULE_CARDS[rule] && needsIntro(progress().seen, rule)) {
+        const glow = RULE_GLOW[rule] ? Array.from(boardEl.querySelectorAll(RULE_GLOW[rule])) : [];
+        glow.forEach((g) => g.classList.add("intro-glow"));
+        const card = el("div", "rule-card");
+        card.append(el("h2", "", RULE_CARDS[rule].title), el("p", "", RULE_CARDS[rule].text));
+        card.append(button("Got it", "primary got-it", () => {
+            card.remove();
+            glow.forEach((g) => g.classList.remove("intro-glow"));
+            void persist({ ...progress(), seen: markSeen(progress().seen, rule) });
+        }));
+        screen.append(card);
     }
     function placePieces(animate) {
         for (const [id, e] of pieceEls) {
@@ -418,6 +452,19 @@ function blip(freq) {
 }
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 window.addEventListener("popstate", () => go({ kind: "home" }));
+/**
+ * Android's system Back (MainActivity asks this before leaving the app). Chromium skips history
+ * entries not created by a user gesture, so native Back cannot rely on history (Sortwise lesson).
+ * Returns true when the game handled it (stepped back to the level list).
+ */
+window.tiltwayHandleBack = () => {
+    if (view.kind === "home")
+        return false;
+    if (view.kind === "tutorial")
+        void persist({ ...progress(), seen: markSeen(progress().seen, "tutorial") });
+    go({ kind: "home" });
+    return true;
+};
 go(needsIntro(progress().seen, "tutorial") ? { kind: "tutorial" } : { kind: "home" });
 void save.restore().then((changed) => {
     if (changed && view.kind === "home")

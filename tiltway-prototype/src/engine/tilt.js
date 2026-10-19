@@ -1,5 +1,6 @@
 export const DIRS = ["up", "right", "down", "left"];
 const DELTA = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+const ARROWS = { "^": "up", v: "down", "<": "left", ">": "right" };
 export function parseLayout(rows) {
     const h = rows.length;
     const w = rows[0]?.length ?? 0;
@@ -8,6 +9,7 @@ export function parseLayout(rows) {
     const walls = new Set();
     const holes = new Map();
     const pieces = [];
+    const specials = new Map();
     rows.forEach((row, y) => [...row].forEach((ch, x) => {
         const i = y * w + x;
         const border = x === 0 || y === 0 || x === w - 1 || y === h - 1;
@@ -23,6 +25,10 @@ export function parseLayout(rows) {
             holes.set(i, ch.toLowerCase());
         else if (ch === "x")
             pieces.push({ id: pieces.length, kind: "crate", color: null, pos: i });
+        else if (ch === "o")
+            specials.set(i, "sticky");
+        else if (ARROWS[ch])
+            specials.set(i, ARROWS[ch]);
         else
             throw new Error(`unknown layout character "${ch}"`);
     }));
@@ -34,7 +40,7 @@ export function parseLayout(rows) {
     }
     if (!pieces.some((p) => p.kind === "marble"))
         throw new Error("no marbles");
-    return { w, h, walls, holes, pieces, sunk: [] };
+    return { w, h, walls, holes, pieces, sunk: [], specials };
 }
 export function tilt(board, dir) {
     const [dx, dy] = DELTA[dir];
@@ -60,12 +66,17 @@ export function tilt(board, dir) {
             const next = y * w + x;
             if (board.walls.has(next) || occupied.has(next))
                 break;
+            const special = board.specials.get(next);
+            if (special && special !== "sticky" && special !== dir)
+                break; // an arrow pointing another way
             pos = next;
             if (p.kind === "marble" && holes.get(pos) === p.color) {
                 holes.delete(pos);
                 sunkAt = pos;
                 break;
             }
+            if (special === "sticky")
+                break;
         }
         paths.push({ id: p.id, from: p.pos, to: pos, sunkAt });
         if (sunkAt !== null)
