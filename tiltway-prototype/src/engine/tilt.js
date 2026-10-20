@@ -99,7 +99,7 @@ export function stateKey(b) {
 /** Breadth-first search: exact fewest moves (small boards; bounded by maxStates). */
 export function solve(start, maxStates = 200000) {
     if (isSolved(start))
-        return { moves: 0, path: [], explored: 1 };
+        return { moves: 0, path: [], explored: 1, complete: true };
     const seen = new Map([[stateKey(start), { prev: null, dir: null }]]);
     let frontier = [start];
     let depth = 0;
@@ -124,14 +124,15 @@ export function solve(start, maxStates = 200000) {
                             path.unshift(s.dir);
                         cur = s.prev;
                     }
-                    return { moves: depth, path, explored: seen.size };
+                    return { moves: depth, path, explored: seen.size, complete: true };
                 }
                 next.push(r.board);
             }
         }
         frontier = next;
     }
-    return { moves: null, path: [], explored: seen.size };
+    // Unsolved: proven only if the search ran out of positions, not out of budget.
+    return { moves: null, path: [], explored: seen.size, complete: frontier.length === 0 };
 }
 /** The first tilt of a shortest solution from here (the hint), or null if none exists. */
 export function hint(b) {
@@ -139,3 +140,11 @@ export function hint(b) {
 }
 /** Can the level still be solved from here? (A marble can get stuck in a corner it cannot leave.) */
 export const solvable = (b) => solve(b).moves !== null;
+/**
+ * A proven dead end: every position reachable from here was searched and none is solved. A search
+ * that hits its budget proves nothing, so it is never reported as a dead end.
+ */
+export function provenDeadEnd(b, maxStates = 200000) {
+    const s = solve(b, maxStates);
+    return s.moves === null && s.complete;
+}

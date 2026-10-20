@@ -117,3 +117,18 @@ button:disabled { opacity: 0.4; cursor: default; }
 .sim-ad p { margin: 0; color: var(--dim); }
 .sim-ad-tag { justify-self: center; padding: 6px 12px; border-radius: 8px; background: #ff9f5a; color: #2a1406; font-weight: 800; letter-spacing: 0.08em; }
 @media (prefers-reduced-motion: reduce) { .hint-mark { animation: none; } }
+/* Recovery: a proven dead end is explained right under the controls, and Undo/Restart stand out. */
+.stuck { border: 2px solid var(--accent); border-radius: 12px; padding: 8px 12px; background: #2a1d12; text-align: center; line-height: 1.35; }
+.stuck strong { color: var(--ink); }
+.stuck span { color: #f3d9c4; }
+.action-btn.recover { background: var(--accent); color: #2a1406; }
+.action-btn.teach { outline: 3px solid var(--accent); outline-offset: 2px; animation: glow 1s ease-in-out infinite alternate; }
+.action-btn.nudge { background: #2b4656; font-size: 0.95rem; line-height: 1.1; padding: 0 8px; }
+@media (prefers-reduced-motion: reduce) { .action-btn.teach { animation: none; } }
+@media (max-height: 640px) { .stuck { padding: 6px 10px; font-size: 0.92rem; } }
+.sound-btn.compact { padding: 0 12px; white-space: nowrap; }
+.play-screen .back-btn { padding: 0 12px; white-space: nowrap; }
+.level-name { white-space: nowrap; }
+@media (max-width: 340px) { .level-name { font-size: 0.95rem; } }
+.titlebox { min-width: 0; }
+.level-name { overflow: hidden; text-overflow: ellipsis; }

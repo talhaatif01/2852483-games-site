@@ -16,7 +16,7 @@ import { focusForKeyboard, installFocusPolicy, markSeen, nativeCall, needsIntro,
 import { createAdsProvider } from "../core/ads.js";
 import { simulatedAdsEnabled, simulatedAdsProvider } from "./preview-ads.js";
 import { CHAPTERS, LEVELS } from "../engine/levels.js";
-import { hint as solverHint, isSolved, parseLayout, solvable, tilt } from "../engine/tilt.js";
+import { hint as solverHint, isSolved, parseLayout, provenDeadEnd, stateKey, tilt } from "../engine/tilt.js";
 import { TUTORIAL_ROWS, TUTORIAL_STEPS } from "../engine/tutorial.js";
 import { creditReward, FREE_HINTS_PER_LEVEL, hintsLeft, medalFor, PROGRESS_SPEC, recordResult, setPrefs, spendHint } from "../engine/progress.js";
 let storage = null;
@@ -86,7 +86,9 @@ function go(next) {
     else
         renderPlay(next.index);
 }
-const unlocked = (i) => i === 0 || !!progress().levels[LEVELS[i - 1].key];
+// Open: the first level, any level already solved (levels can be reordered between versions), or
+// the one after a solved level.
+const unlocked = (i) => i === 0 || !!progress().levels[LEVELS[i].key] || !!progress().levels[LEVELS[i - 1].key];
 const nextIndex = () => {
     const i = LEVELS.findIndex((l) => !progress().levels[l.key]);
     return i < 0 ? LEVELS.length - 1 : i;
@@ -121,11 +123,19 @@ function renderHome() {
     app.append(screen);
     focusForKeyboard(screen.querySelector(".play-btn"));
 }
-function soundButton() {
-    const b = button(progress().soundOn ? "Sound on" : "Sound off", "secondary sound-btn", () => {
+/**
+ * Sound toggle. In a level the header is narrow, so it shows a compact "♪ On/Off" (the accessible
+ * name stays "Sound on/off"): a long chapter name ("Three colours") wrapped to two lines at 360 px
+ * and shrank the board (level audit 2026-10-20).
+ */
+function soundButton(compact = false) {
+    const label = () => (compact ? (progress().soundOn ? "♪ On" : "♪ Off") : progress().soundOn ? "Sound on" : "Sound off");
+    const b = button(label(), `secondary sound-btn${compact ? " compact" : ""}`, () => {
         void persist(setPrefs(progress(), { soundOn: !progress().soundOn }));
-        b.textContent = progress().soundOn ? "Sound on" : "Sound off";
+        b.textContent = label();
+        b.setAttribute("aria-label", progress().soundOn ? "Sound on" : "Sound off");
     });
+    b.setAttribute("aria-label", progress().soundOn ? "Sound on" : "Sound off");
     return b;
 }
 /**
@@ -178,8 +188,8 @@ function renderHelp() {
         ["Three colours", "Red circles, blue triangles and yellow squares: each marble needs the hole with its own colour and shape.", "colours"],
         ["Arrows", "Pieces can only roll onto an arrow tile in the direction it points. Rolling off is free.", "arrows"],
         ["Medals", "Gold: the fewest possible tilts without a hint. Silver: up to two tilts more. Bronze: any solve.", null],
-        ["Hints", `Each level has ${FREE_HINTS_PER_LEVEL} free hints. A hint shows the next tilt of a shortest solution from where you are. Used hints don't come back when you restart, replay or reopen the game. When a level has none left, you can choose to watch a short ad to earn 1 more hint for that level. Ads never play unless you ask.`, null],
-        ["Undo and restart", "Both are free. A marble stuck in a corner it cannot leave? Undo.", null],
+        ["Undo and restart", "A wrong tilt can make a level impossible to finish. Undo takes back your last tilt, as many times as you like, all the way to the start (or press Z). Restart puts the level back as it began. Both are always free, and the game tells you when a position can no longer be finished.", null],
+        ["Hints", `Each level has ${FREE_HINTS_PER_LEVEL} free hints. A hint shows the next tilt of a shortest solution from where you are. Used hints stay used, even after Undo, Restart or Replay. When a level has none left, tap "Need a nudge?": you can watch an ad to unlock 1 extra hint for that level. Ads never play unless you choose to.`, null],
         ["Privacy", privacy, null],
         ["About", `Tiltway is a ${BRAND.studio} game, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`, null],
     ];
@@ -220,7 +230,7 @@ function renderPlay(index) {
     const levelNo = level ? LEVELS.filter((l, j) => l.chapter === level.chapter && j <= index).length : 0;
     const titleBox = el("div", "titlebox");
     titleBox.append(el("div", "eyebrow", tutorial ? "Tutorial" : `Level ${chapterNo}-${levelNo}`), el("div", "level-name", tutorial ? "How to tilt" : CHAPTERS[chapterNo - 1].name));
-    head.append(button(tutorial ? "‹ Skip" : "‹ Levels", "secondary back-btn skip-btn", () => finishTutorialOr(() => go({ kind: "home" }))), titleBox, soundButton());
+    head.append(button(tutorial ? "‹ Skip" : "‹ Levels", "secondary back-btn skip-btn", () => finishTutorialOr(() => go({ kind: "home" }))), titleBox, soundButton(true));
     const info = el("div", "info-row");
     const movesEl = el("div", "moves", "");
     const goal = el("div", "goal", tutorial ? "" : `Gold: ${level.optimal} tilts`);
@@ -242,19 +252,23 @@ function renderPlay(index) {
     hintMark.hidden = true;
     boardEl.append(hintMark);
     const actions = el("div", "actions");
-    const undoBtn = button("Undo", "action-btn undo-btn", () => undo());
-    const restartBtn = button("Restart", "action-btn restart-btn", () => restart());
+    const undoBtn = button("Undo", "action-btn undo-btn", () => undo(), "Undo last tilt");
+    const restartBtn = button("Restart", "action-btn restart-btn", () => restart(), "Restart level");
     const hintBtn = button("Hint", "action-btn hint-btn", () => showHint());
     actions.append(undoBtn, restartBtn, hintBtn);
     const message = el("div", "message");
     message.setAttribute("role", "status");
+    // Shown only for a PROVEN dead end (the whole reachable space was searched).
+    const stuck = el("div", "stuck");
+    stuck.setAttribute("role", "status");
+    stuck.hidden = true;
     const winPanel = el("div", "win-panel");
     winPanel.hidden = true;
     const adPanel = el("div", "ad-panel");
     adPanel.setAttribute("role", "dialog");
     adPanel.setAttribute("aria-labelledby", "ad-title");
     adPanel.hidden = true;
-    screen.append(head, info, coach, wrap, ...(pad ? [pad] : []), actions, message, winPanel, adPanel);
+    screen.append(head, info, coach, wrap, ...(pad ? [pad] : []), actions, stuck, message, winPanel, adPanel);
     app.append(screen);
     // Cell size from the space actually available.
     let cell = 40;
@@ -328,11 +342,15 @@ function renderPlay(index) {
     }
     function paint() {
         movesEl.textContent = `${moves} ${moves === 1 ? "tilt" : "tilts"}`;
-        undoBtn.disabled = !history.length || solved;
-        restartBtn.disabled = !history.length || solved;
+        const tutStep = tutorial && step < TUTORIAL_STEPS.length ? TUTORIAL_STEPS[step] : null;
+        // In the tutorial, Undo is the lesson of one step; elsewhere it is always available.
+        undoBtn.disabled = !history.length || solved || (tutorial && !(tutStep && "undo" in tutStep));
+        undoBtn.classList.toggle("teach", !!tutStep && "undo" in tutStep);
+        restartBtn.disabled = !history.length || solved || tutorial;
         const left = level ? hintsLeft(progress(), level.key) : 0;
-        hintBtn.textContent = tutorial ? "Hint" : `Hint · ${left}`;
-        hintBtn.setAttribute("aria-label", tutorial ? "Hint" : left ? `Hint, ${left} left` : "Hint, none left: you can watch an ad to earn one");
+        hintBtn.textContent = tutorial ? "Hint" : left ? `Hint · ${left}` : "Need a nudge?";
+        hintBtn.classList.toggle("nudge", !tutorial && !left);
+        hintBtn.setAttribute("aria-label", tutorial ? "Hint" : left ? `Hint, ${left} left` : "Need a nudge? No hints left. Watch an ad to unlock 1 extra hint.");
         // The guided tutorial shows every move itself and never uses hints.
         hintBtn.disabled = tutorial || solved || watching;
         if (tutorial) {
@@ -343,14 +361,21 @@ function renderPlay(index) {
     async function doTilt(d) {
         if (busy || solved)
             return;
-        if (tutorial && step < TUTORIAL_STEPS.length && d !== TUTORIAL_STEPS[step].dir) {
-            say(`Try ${TUTORIAL_STEPS[step].dir.toUpperCase()} this time.`);
+        const tutStep = tutorial && step < TUTORIAL_STEPS.length ? TUTORIAL_STEPS[step] : null;
+        if (tutStep && "undo" in tutStep) {
+            say("Tap Undo this time.");
+            shake();
+            return;
+        }
+        if (tutStep && "dir" in tutStep && d !== tutStep.dir) {
+            say(`Try ${tutStep.dir.toUpperCase()} this time.`);
             shake();
             return;
         }
         const r = tilt(board, d);
         if (!r.moved) {
-            say("Nothing can roll that way.");
+            // In a dead end the recovery notice stays; the shake says that nothing moved.
+            say(stuck.hidden ? "Nothing can roll that way." : "");
             shake();
             return;
         }
@@ -380,23 +405,52 @@ function renderPlay(index) {
         paint();
         if (isSolved(board))
             win();
-        else if (!tutorial && !solvable(board))
-            say("A marble is stuck where it can't reach its hole. Undo or restart.");
+        else
+            checkStuck();
+    }
+    // ----- recovery: proven dead ends are explained; nothing resets by itself
+    const deadCache = new Map();
+    const isDead = (b) => {
+        const k = stateKey(b);
+        if (!deadCache.has(k))
+            deadCache.set(k, provenDeadEnd(b));
+        return deadCache.get(k);
+    };
+    function checkStuck() {
+        const dead = !tutorial && !solved && isDead(board);
+        stuck.hidden = !dead;
+        undoBtn.classList.toggle("recover", dead);
+        restartBtn.classList.toggle("recover", dead);
+        if (!dead)
+            return;
+        // How many tilts back the level could still be finished (each one is a free Undo).
+        let back = 1;
+        while (back < history.length && isDead(history[history.length - back]))
+            back++;
+        stuck.replaceChildren(el("strong", "", "This can't be finished from here."), el("span", "", back === 1 ? " Undo your last tilt or restart. Both are free." : ` Undo ${back} tilts or restart. Both are free.`));
+        say("");
     }
     function undo() {
         if (busy || !history.length || solved)
             return;
+        if (tutorial && !(step < TUTORIAL_STEPS.length && "undo" in TUTORIAL_STEPS[step]))
+            return;
         board = history.pop();
         moves = Math.max(0, moves - 1);
+        if (tutorial)
+            step++;
         for (const e of pieceEls.values())
             e.classList.toggle("sunk", !board.pieces.some((p) => p.id === Number(e.dataset.id)));
+        for (const [i, h] of holeEls)
+            h.classList.toggle("filled", !board.holes.has(i));
         placePieces(true);
-        say("");
+        say(tutorial ? "" : "Took back 1 tilt.");
         clearHint();
         paint();
+        checkStuck();
     }
     function restart() {
-        if (busy || solved)
+        if (busy || solved || tutorial || !history.length)
             return;
         board = start;
         history = [];
@@ -404,22 +458,26 @@ function renderPlay(index) {
         for (const e of pieceEls.values())
             e.classList.remove("sunk");
         placePieces(true);
-        say("");
+        say("Back to the start.");
         clearHint();
         paint();
+        checkStuck();
     }
     function showHint() {
         if (!level || busy || solved || watching)
             return;
+        // In a dead end no hint is charged and no ad is offered: recovery (Undo/Restart) is free.
+        if (isDead(board)) {
+            checkStuck();
+            return;
+        }
         if (hintsLeft(progress(), level.key) <= 0) {
             openAdOffer();
             return;
         }
         const d = solverHint(board);
-        if (!d) {
-            say("No solution from here. Undo or restart first.");
+        if (!d)
             return;
-        }
         const spent = spendHint(progress(), level.key);
         if (!spent)
             return;
@@ -450,17 +508,17 @@ function renderPlay(index) {
             return;
         const key = level.key;
         adPanel.replaceChildren();
-        const h = el("h2", "ad-title", "No hints left on this level");
+        const h = el("h2", "ad-title", "Need a nudge?");
         h.id = "ad-title";
-        const text = el("p", "ad-text", "Watch a short ad to earn 1 hint for this level. It's optional - you can keep playing without it.");
+        const text = el("p", "ad-text", "Watch an ad to unlock 1 extra hint for this level.");
         adPanel.append(h, text);
         if (adsMode === "simulated")
             adPanel.append(el("p", "ad-note", "Browser preview: the ad is simulated. No real ad is shown."));
         if (adsMode === "none")
             adPanel.append(el("p", "ad-note", "Ads aren't available in this browser version, so no hint can be earned here."));
         const row = el("div", "ad-actions");
-        const watch = button("Watch an ad to earn 1 hint", "primary watch-btn", () => void watchAd());
-        const notNow = button("Not now", "secondary not-now-btn", () => {
+        const watch = button("Watch ad", "primary watch-btn", () => void watchAd(), "Watch ad to unlock 1 extra hint");
+        const notNow = button("Keep playing", "secondary not-now-btn", () => {
             if (!watching)
                 closeAdOffer();
         });
@@ -476,7 +534,7 @@ function renderPlay(index) {
             watching = true;
             watch.disabled = true;
             notNow.disabled = true;
-            text.textContent = "Loading an ad…";
+            text.textContent = "Loading the ad…";
             paint();
             const before = hintsLeft(progress(), key);
             let status = "unavailable";
@@ -501,14 +559,14 @@ function renderPlay(index) {
                 return;
             closeAdOffer();
             if (hintsLeft(progress(), key) > before)
-                say("You earned 1 hint for this level. Tap Hint to use it.");
+                say("Your hint is ready! Tap Hint to use it.");
             else if (status === "closed")
-                say("The ad was closed before the end, so no hint was earned. Keep playing as you like.");
+                say("The ad was closed before the end, so no hint was unlocked. Keep playing as you like.");
             // Offline before Google's consent check has ever run also reports "consent".
             else if (status === "consent")
-                say("Ads can't be shown right now (they need a connection and ad consent). You can keep playing without a hint.");
+                say("No ad can be shown right now (ads need a connection and ad consent). Keep playing as you like.");
             else
-                say("No ad is available right now. You can keep playing without a hint.");
+                say("No ad is available right now. Keep playing as you like.");
             focusForKeyboard(hintBtn);
         }
     }
@@ -521,7 +579,7 @@ function renderPlay(index) {
         paint();
         if (tutorial) {
             void persist({ ...progress(), seen: markSeen(progress().seen, "tutorial") });
-            winPanel.replaceChildren(el("h2", "", "That's it!"), el("p", "", "Tilt, roll, drop. Every level can be solved; aim for the fewest tilts."), el("p", "tutorial-tip", "Prefer tapping to swiping? Turn on Direction buttons on the level list or in How to play."));
+            winPanel.replaceChildren(el("h2", "", "That's it!"), el("p", "", "Tilt, roll, drop. Every level can be solved; aim for the fewest tilts."), el("p", "tutorial-tip", "Wrong tilt? Undo is free and unlimited. Prefer tapping to swiping? Turn on Direction buttons on the level list or in How to play."));
             winPanel.append(button("Start playing", "primary next-btn", () => go({ kind: "level", index: nextIndex() })));
         }
         else {
@@ -568,6 +626,11 @@ function renderPlay(index) {
     });
     wrap.addEventListener("pointercancel", () => (down = null));
     const onKey = (e) => {
+        if ((e.key === "z" || e.key === "Z" || e.key === "Backspace") && !e.altKey && !e.metaKey) {
+            e.preventDefault();
+            undo();
+            return;
+        }
         const d = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" }[e.key];
         if (d) {
             e.preventDefault();
