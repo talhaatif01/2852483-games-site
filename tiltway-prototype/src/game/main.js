@@ -1,5 +1,5 @@
 /**
- * Tiltway UI. Screens: home (chapters and levels), level, tutorial (first play; replayable), How
+ * Tiltwise UI. Screens: home (chapters and levels), level, tutorial (first play; replayable), How
  * to play. Input: swipe anywhere on the board (primary), the keyboard arrows, or optional
  * direction buttons under the board ("Direction buttons" setting, Off by default). Every tilt
  * animates each piece along its real path; a tilt that moves nothing shakes the board and costs
@@ -97,7 +97,7 @@ const nextIndex = () => {
 function renderHome() {
     const screen = el("div", "screen home-screen");
     const head = el("header", "top");
-    head.append(el("h1", "title", "Tiltway"), soundButton());
+    head.append(el("h1", "title", "Tiltwise"), soundButton());
     const solved = LEVELS.filter((l) => progress().levels[l.key]).length;
     screen.append(head, el("p", "lede", `Tilt the board. Drop every marble in its own hole. ${solved}/${LEVELS.length} solved.`));
     screen.append(button(solved ? "Continue" : "Play", "primary play-btn", () => go({ kind: "level", index: nextIndex() })));
@@ -175,10 +175,10 @@ function renderHelp() {
     // Rules appear here once the player has met them (no spoilers); the rest is always shown.
     const seen = progress().seen;
     const privacy = adsMode === "native"
-        ? "Tiltway stores your progress only on this device and has no accounts. Ads play only when you choose to watch one for a hint. They are provided by Google AdMob, which collects some device data (such as the advertising ID and IP address) when an ad is requested."
+        ? "Tiltwise stores your progress only on this device and has no accounts. Ads play only when you choose to watch one for a hint. They are provided by Google AdMob, which collects some device data (such as the advertising ID and IP address) when an ad is requested."
         : adsMode === "simulated"
-            ? "Tiltway stores your progress only in this browser and has no accounts. In this preview, ads are simulated: no real ad is shown and nothing is sent anywhere."
-            : "Tiltway stores your progress only in this browser. It has no accounts, shows no ads here and sends nothing anywhere.";
+            ? "Tiltwise stores your progress only in this browser and has no accounts. In this preview, ads are simulated: no real ad is shown and nothing is sent anywhere."
+            : "Tiltwise stores your progress only in this browser. It has no accounts, shows no ads here and sends nothing anywhere.";
     const entries = [
         ["Tilt", "Swipe anywhere on the board: up, down, left or right. Every loose piece rolls that way until it hits a wall or another piece. Arrow keys on a keyboard work too.", null],
         ["Direction buttons", "Prefer tapping? Turn on Direction buttons (below, or on the level list) to show ↑ ← → ↓ buttons under the board. They are off unless you turn them on.", null],
@@ -191,7 +191,7 @@ function renderHelp() {
         ["Undo and restart", "A wrong tilt can make a level impossible to finish. Undo takes back your last tilt, as many times as you like, all the way to the start (or press Z). Restart puts the level back as it began. Both are always free, and the game tells you when a position can no longer be finished.", null],
         ["Hints", `Each level has ${FREE_HINTS_PER_LEVEL} free hints. A hint shows the next tilt of a shortest solution from where you are. Used hints stay used, even after Undo, Restart or Replay. When a level has none left, tap "Need a nudge?": you can watch an ad to unlock 1 extra hint for that level. Ads never play unless you choose to.`, null],
         ["Privacy", privacy, null],
-        ["About", `Tiltway is a ${BRAND.studio} game, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`, null],
+        ["About", `Tiltwise is a ${BRAND.studio} game, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`, null],
     ];
     for (const [t, p, gate] of entries) {
         if (gate && !seen.includes(gate))
