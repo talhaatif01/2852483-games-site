@@ -27,6 +27,8 @@ catch {
     storage = null;
 }
 const native = nativeCall();
+// Tiltwise's own policy (live, verified HTTP 200). Players only ever see the label, never the host.
+const PRIVACY_POLICY_URL = "https://talhaatif01.github.io/2852483-games-site/tiltwise/privacy/";
 const save = new DurableSave(PROGRESS_SPEC, storage, native);
 const ads = createAdsProvider(native, "TiltwayAds") ?? (simulatedAdsEnabled() ? simulatedAdsProvider() : null);
 const adsMode = !ads ? "none" : globalThis.studioTestAds ? "test" : native ? "native" : "simulated";
@@ -190,7 +192,7 @@ function renderHelp() {
         ["Medals", "Gold: the fewest possible tilts without a hint. Silver: up to two tilts more. Bronze: any solve.", null],
         ["Undo and restart", "A wrong tilt can make a level impossible to finish. Undo takes back your last tilt, as many times as you like, all the way to the start (or press Z). Restart puts the level back as it began. Both are always free, and the game tells you when a position can no longer be finished.", null],
         ["Hints", `Each level has ${FREE_HINTS_PER_LEVEL} free hints. A hint shows the next tilt of a shortest solution from where you are. Used hints stay used, even after Undo, Restart or Replay. When a level has none left, tap "Need a nudge?": you can watch an ad to unlock 1 extra hint for that level. Ads never play unless you choose to.`, null],
-        ["Privacy", privacy, null],
+        ["Privacy policy", privacy, null],
         ["About", `Tiltwise is a ${BRAND.studio} game, published by ${BRAND.legalPublisher}, ${BRAND.jurisdiction}. ${BRAND.supportLabel}: ${BRAND.supportEmail}`, null],
     ];
     for (const [t, p, gate] of entries) {
@@ -200,7 +202,9 @@ function renderHelp() {
         s.append(el("h2", "", t), el("p", "", p));
         if (t === "Direction buttons")
             s.append(dirButtonsSwitch(false));
-        if (t === "Privacy" && ads && adsState.privacyOptionsRequired) {
+        if (t === "Privacy policy")
+            s.append(privacyPolicyLink());
+        if (t === "Privacy policy" && ads && adsState.privacyOptionsRequired) {
             s.append(button("Privacy choices", "secondary privacy-btn", () => {
                 void ads.showPrivacyOptions().then((st) => (adsState = st));
             }));
@@ -211,6 +215,24 @@ function renderHelp() {
         screen.append(el("p", "fineprint", "More rules appear as you play."));
     screen.append(button("Replay the tutorial", "primary cta", () => go({ kind: "tutorial" })));
     app.append(screen);
+}
+/**
+ * The full privacy policy, one tap from How to play. In the Android app a link to another site is
+ * handed to the phone's browser by Capacitor (the app itself never leaves); in a browser it opens a
+ * new tab so the game keeps its place.
+ */
+function privacyPolicyLink() {
+    const p = el("p", "policy-row");
+    const a = el("a", "policy-link", "Tiltwise Privacy Policy");
+    a.href = PRIVACY_POLICY_URL;
+    if (!native) {
+        a.target = "_blank";
+        a.rel = "noopener";
+    }
+    const mail = el("a", "policy-mail", BRAND.supportEmail);
+    mail.href = `mailto:${BRAND.supportEmail}`;
+    p.append(a, el("span", "policy-sep", " · "), document.createTextNode(`${BRAND.supportLabel}: `), mail);
+    return p;
 }
 // ------------------------------------------------------------------ play
 function renderPlay(index) {
