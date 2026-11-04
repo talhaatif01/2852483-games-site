@@ -20,17 +20,35 @@
   .meta{color:var(--ink-dim); font-size:0.9rem}
   .box{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:18px 20px; margin-top:16px}
   .box p{margin:6px 0}
+  .hero{display:grid; gap:4px} .hero .logo{border-radius:24px; margin-bottom:10px; box-shadow:0 8px 30px #0003}
+  .lead{font-size:1.15rem; font-weight:500}
+  .games{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .game{display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px; text-decoration:none; color:var(--ink)}
+  .game:hover{border-color:var(--accent)} .game strong{font-size:1.05rem} .game span{color:var(--ink-dim); font-size:0.92rem; line-height:1.5} .game em{font-style:normal; color:var(--accent); font-weight:600; font-size:0.9rem; margin-top:4px}
   footer{padding-block:28px; color:var(--ink-dim); font-size:0.78rem; border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
 <nav><span class="org">TIVEXA</span><a href="./">Home</a><a href="./sortwise/">Sortwise</a><a href="./privacy/">Tivexa Privacy Policy</a><a href="./support/">Tivexa Support</a></nav>
-<section>
+<section class="hero">
+  <img class="logo" src="assets/tivexa-logo-512.png" width="112" height="112" alt="Tivexa logo">
   <div class="eyebrow">Game studio</div>
   <h1>TIVEXA</h1>
+  <p class="lead">Original puzzle games for Android. Relaxing, offline, made by Tivexa.</p>
   <p>TIVEXA is the game studio of 2852483 Alberta Inc., a Canadian company based in Alberta that develops and publishes software and games.</p>
-  <p>Our first game is <a href="sortwise/">Sortwise</a>, a calm tile-arranging puzzle for Android. Our newest is <strong>Signal Garden</strong>, a glowing circuit puzzle (<a href="signal-garden/privacy/">privacy policy</a>).</p>
-  <p>See the <a href="privacy/">Tivexa Privacy Policy</a> and <a href="support/">Tivexa Support</a> pages for more information.</p>
+</section>
+<section>
+  <h2>Our games</h2>
+  <div class="games">
+    <a class="game" href="https://play.google.com/store/apps/details?id=ca.alberta2852483.sortwise">
+      <strong>Sortwise</strong><span>A calm tile-arranging puzzle.</span><em>Get it on Google Play</em>
+    </a>
+    <a class="game" href="https://play.google.com/store/apps/dev?id=7595142451480358679">
+      <strong>Signal Garden</strong><span>Turn the branches, light the garden. 100 glowing circuit puzzles.</span><em>Coming soon on Google Play</em>
+    </a>
+  </div>
+  <p class="meta">All Tivexa games: <a href="https://play.google.com/store/apps/dev?id=7595142451480358679">our Google Play developer page</a>. Follow us: <a href="https://www.facebook.com/profile.php?id=61596164493672">Facebook</a> &middot; <a href="https://www.pinterest.com/tivexagames/">Pinterest</a>.</p>
+  <p>See the <a href="privacy/">Tivexa Privacy Policy</a>, <a href="signal-garden/privacy/">Signal Garden privacy policy</a> and <a href="support/">Tivexa Support</a> pages for more information.</p>
 </section>
 <footer>&copy; 2026 TIVEXA &middot; published by 2852483 Alberta Inc., Alberta, Canada</footer>
 </body>
