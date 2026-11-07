@@ -1503,6 +1503,10 @@ function renderPlay(index) {
     function openAdOffer() {
         if (tutorial || solved)
             return;
+        // Web build: with no ad provider (plain browser) the offer can never be fulfilled,
+        // so it is not shown at all rather than loading forever.
+        if (!ads)
+            return;
         const key = level.key;
         adPanel.replaceChildren();
         const h = el("h2", "ad-title", "No hints left on this level");
