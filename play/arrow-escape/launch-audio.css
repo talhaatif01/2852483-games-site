@@ -1,0 +1,19 @@
+/* Tivexa launch + audio module v1. Colours come from custom properties a game may override:
+   --la-bg, --la-ink, --la-accent, --la-accent-ink, --la-muted. */
+.la-launch{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:24px;text-align:center;overflow:hidden;
+  background:var(--la-bg,radial-gradient(ellipse at 30% 25%,#f7dde0,transparent 60%),#fcf4ed);color:var(--la-ink,#4f3c4d);transition:opacity .26s ease}
+.la-launch.la-leaving{opacity:0;pointer-events:none}
+.la-glow{position:absolute;inset:18% -20% auto;height:46vh;background:radial-gradient(ellipse,#e7d3eb90,transparent 70%);pointer-events:none;animation:la-glow 1.6s ease-out both}
+.la-mark{position:relative;font:850 clamp(40px,13vw,64px)/1 'Segoe UI',system-ui,sans-serif;letter-spacing:.2em;margin-right:-.2em;animation:la-rise .9s cubic-bezier(.2,.8,.2,1) both}
+.la-studios{position:relative;margin:4px 0 26px;font:750 11px/1 system-ui,sans-serif;letter-spacing:.42em;color:var(--la-muted,#967b9a);animation:la-fade .9s .25s both}
+.la-title{position:relative;margin:0 0 30px;font:800 clamp(24px,7vw,34px)/1.15 system-ui,sans-serif;animation:la-fade .8s .45s both}
+.la-begin{position:relative;min-width:180px;min-height:56px;padding:0 34px;border-radius:999px;border:0;font:750 18px/1 system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;
+  background:var(--la-accent,#b96d7e);color:var(--la-accent-ink,#fff);box-shadow:0 10px 30px #b96d7e44;animation:la-fade .6s .8s both,la-breathe 2.4s 1.4s ease-in-out infinite}
+.la-begin:focus-visible{outline:3px solid #9374a5;outline-offset:4px}
+.la-toggle{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;padding:0 4px;border-bottom:1px solid #eadfe4;font:600 15px/1.3 system-ui,sans-serif;cursor:pointer}
+.la-toggle input{width:44px;height:26px;accent-color:#b96d7e;cursor:pointer}
+@keyframes la-rise{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes la-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes la-glow{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+@keyframes la-breathe{50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.la-launch *{animation:none!important}}

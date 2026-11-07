@@ -1,0 +1,372 @@
+/* Sortwise - mobile-first, portrait. Original code-drawn visuals only. */
+:root {
+  --bg: #161b33;
+  --bg-2: #222a4d;
+  --surface: #2a3260;
+  --surface-2: #343d72;
+  --line: #4a5490;
+  --text: #f4f1ea;
+  --muted: #b9bde0;
+  --accent: #ffd36b;
+  --focus: #ffffff;
+  --kind-A: #f6b93b;
+  --kind-B: #4fc98e;
+  --kind-C: #4ea8f2;
+  --kind-D: #ea6aa6;
+  --glyph: rgba(18, 22, 46, 0.78);
+  --gold: #ffcf4a;
+  --silver: #d7dcef;
+  --bronze: #e0a070;
+  --radius: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  /* 1.3.5: the shared Tivexa launch screen in Sortwise's colours */
+  --la-bg: radial-gradient(ellipse at 30% 25%, #2a3260, transparent 60%), #161b33;
+  --la-ink: #f4f1ea;
+  --la-accent: #ffd36b;
+  --la-accent-ink: #1b2040;
+  --la-muted: #b9bde0;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(120% 80% at 50% 0%, var(--bg-2), var(--bg) 70%) fixed, var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  /* No double-tap zoom: every tap is delivered at once and none is held back as a possible
+     second tap of a zoom gesture. The board itself uses touch-action: none for swipes. */
+  touch-action: manipulation;
+}
+
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--app-h, 100dvh);
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(8px + var(--safe-top)) calc(16px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(16px + var(--safe-left));
+  gap: 10px;
+}
+
+/* ---------- top bar ---------- */
+.topbar { display: flex; align-items: center; gap: 8px; min-height: 48px; }
+.brand { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.02em; flex: 1; }
+.level-title { flex: 1; display: flex; flex-direction: column; align-items: center; line-height: 1.15; min-width: 0; }
+.level-num { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.level-name { font-size: 1.15rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+.icon { width: 22px; height: 22px; fill: currentColor; flex: none; }
+.icon.tiny { width: 14px; height: 14px; vertical-align: -2px; }
+.icon-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 48px; min-width: 48px; padding: 0 12px; /* QA sortwise-j292 D4: 48 dp targets, also when icon-only */
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  cursor: pointer;
+}
+.icon-btn .btn-label { font-size: 0.85rem; }
+.sound-btn[aria-pressed="false"] { color: var(--muted); }
+
+/* ---------- map ---------- */
+.map-intro { margin: 0; color: var(--muted); }
+.cta { width: 100%; }
+.primary, .secondary {
+  min-height: 52px; padding: 0 18px; border-radius: var(--radius); cursor: pointer;
+  font-weight: 700; font-size: 1.05rem;
+}
+.primary { background: var(--accent); color: #2a1f00; border: none; box-shadow: 0 4px 0 #b48a1d; }
+.primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #b48a1d; }
+.secondary { background: var(--surface); border: 1px solid var(--line); }
+
+.level-path { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.level-node {
+  width: 100%; min-height: 64px; display: flex; align-items: center; gap: 10px; text-align: left;
+  padding: 8px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  cursor: pointer;
+}
+.level-node.is-next { border: 2px solid var(--accent); box-shadow: 0 0 0 3px rgba(255, 211, 107, 0.18); }
+.level-node.is-locked { opacity: 0.55; cursor: default; }
+.node-num {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface-2); font-weight: 800;
+}
+.is-next .node-num { background: var(--accent); color: #2a1f00; }
+.node-info { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.node-name { font-weight: 700; font-size: 0.95rem; }
+.node-status { font-size: 0.8rem; color: var(--muted); }
+.medal { font-size: 0.8rem; display: inline-flex; gap: 4px; align-items: baseline; }
+.medal-gold .stars { color: var(--gold); }
+.medal-silver .stars { color: var(--silver); }
+.medal-bronze .stars { color: var(--bronze); }
+.medal-name { color: var(--muted); }
+.fineprint { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: auto; }
+
+/* ---------- play ---------- */
+.tip {
+  margin: 0; padding: 8px 12px; background: rgba(255, 255, 255, 0.06); border-radius: 10px;
+  font-size: 0.95rem; line-height: 1.35; text-align: center;
+}
+.info-row { display: flex; gap: 14px; align-items: center; }
+.target-card { margin: 0; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; flex: none; }
+.target-card figcaption { text-align: center; font-size: 0.75rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+.target-grid { display: grid; gap: 3px; }
+.t-cell { width: 22px; height: 22px; border-radius: 5px; display: grid; place-items: center; }
+.t-cell.hole { background: transparent; }
+.t-cell .glyph { width: 15px; height: 15px; fill: var(--glyph); }
+.stats { flex: 1; min-width: 0; }
+.moves { font-size: 1rem; }
+.moves-num { font-size: 1.8rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.goals { list-style: none; margin: 2px 0 0; padding: 0; font-size: 0.82rem; color: var(--muted); }
+.goal .stars { letter-spacing: 1px; }
+.goal-gold .stars { color: var(--gold); }
+.goal-silver .stars { color: var(--silver); }
+.goal-bronze .stars { color: var(--bronze); }
+.goal.missed { text-decoration: line-through; opacity: 0.55; }
+.best { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+/* The play screen is exactly one screen tall, so the board area takes whatever room is left
+   (a card or the win panel appearing shrinks it) and the board is laid out to fit. */
+/* --app-h follows the real viewport (set from innerHeight): in the Android WebView, dvh does not
+   shrink when the view is resized for the banner. */
+.play-screen { height: var(--app-h, 100dvh); }
+.board-wrap { flex: 1; min-height: 160px; display: grid; place-items: center; }
+.board { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; }
+.slot, .tile { position: absolute; left: 0; top: 0; width: var(--cell); height: var(--cell); border-radius: calc(var(--cell) * 0.2); }
+/* Cell backgrounds sit in their own layer below every tile and never receive taps. */
+.slot-layer { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.slot { pointer-events: none; background: rgba(0, 0, 0, 0.22); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.slot.hole { background: transparent; box-shadow: none; }
+
+.kind-A { background: var(--kind-A); }
+.kind-B { background: var(--kind-B); }
+.kind-C { background: var(--kind-C); }
+.kind-D { background: var(--kind-D); }
+
+.tile {
+  border: none; padding: 0; cursor: pointer; display: grid; place-items: center;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 170ms cubic-bezier(0.3, 0.7, 0.4, 1), filter 150ms, box-shadow 150ms;
+  will-change: transform;
+  z-index: 1;
+}
+.board.no-anim .tile { transition: none; }
+.tile .glyph { width: 54%; height: 54%; fill: var(--glyph); pointer-events: none; }
+.badge {
+  position: absolute; width: 34%; height: 34%; max-width: 26px; max-height: 26px; border-radius: 50%;
+  display: none; place-items: center; pointer-events: none;
+}
+.badge .icon { width: 70%; height: 70%; }
+.lock-badge { top: -6%; right: -6%; background: #1d2240; color: #fff; box-shadow: 0 0 0 2px #fff; }
+.ok-badge { bottom: 5%; right: 5%; background: rgba(18, 22, 46, 0.55); color: #fff; width: 26%; height: 26%; }
+.tile.is-locked .lock-badge { display: grid; }
+.tile.is-correct:not(.is-locked) .ok-badge { display: grid; }
+
+/* Locked: hatched and dimmed, plus the padlock badge - never colour alone. */
+.tile.is-locked {
+  cursor: not-allowed;
+  background-image: repeating-linear-gradient(45deg, rgba(20, 24, 50, 0.35) 0 6px, transparent 6px 12px);
+  filter: saturate(0.6) brightness(0.85);
+}
+.tile.is-selected {
+  box-shadow: 0 0 0 4px var(--focus), 0 0 0 7px rgba(0, 0, 0, 0.5), 0 10px 18px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+.tile.can-swap::after {
+  content: ""; position: absolute; inset: -5px; border-radius: inherit;
+  border: 3px dashed rgba(255, 255, 255, 0.85); pointer-events: none;
+}
+.tile.is-hint { z-index: 2; animation: hint-pulse 1s ease-in-out infinite; }
+@keyframes hint-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--accent), 0 0 14px 4px rgba(255, 211, 107, 0.6); }
+  50% { box-shadow: 0 0 0 6px var(--accent), 0 0 22px 8px rgba(255, 211, 107, 0.35); }
+}
+.tile.shake .glyph { animation: shake 0.4s; }
+@keyframes shake { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+.tile.needs-fix::before {
+  content: ""; position: absolute; inset: -4px; border-radius: inherit; pointer-events: none;
+  border: 3px solid #fff; animation: needs-fix 0.6s ease-out;
+}
+@keyframes needs-fix { from { opacity: 1; transform: scale(1.12); } to { opacity: 0; transform: scale(1); } }
+.tile.unlocking .glyph { animation: pop 0.6s ease-out; }
+@keyframes pop { 40% { transform: scale(1.35) rotate(-8deg); } }
+.tile.celebrate .glyph { animation: pop 0.5s ease-out both; animation-delay: inherit; }
+
+.message { min-height: 2.6em; margin: 0; text-align: center; font-size: 0.92rem; color: var(--muted); line-height: 1.3; }
+
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.action-btn {
+  min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer;
+}
+.action-btn .btn-label { font-size: 0.8rem; }
+.action-btn:disabled, .icon-btn:disabled { opacity: 0.4; cursor: default; }
+
+.win-panel {
+  padding: 16px; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--line);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.35); text-align: center;
+  animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+}
+.win-panel h2 { margin: 4px 0; font-size: 1.5rem; }
+.win-medal .stars { font-size: 2.4rem; letter-spacing: 4px; }
+.win-detail { margin: 0 0 14px; color: var(--muted); }
+.win-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.win-actions .primary { grid-column: 1 / -1; }
+@keyframes rise { from { transform: translateY(30px); opacity: 0; } }
+.play-screen.is-won .actions, .play-screen.is-won .message { display: none; }
+
+@media (max-width: 399px) {
+  .topbar .btn-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .icon-btn { padding: 0 10px; }
+}
+
+@media (max-height: 640px) {
+  /* QA sortwise-j386 D1: the solved panel and all its buttons must fit a short phone. */
+  .win-panel { padding: 8px 12px; }
+  .win-medal .stars { font-size: 1.4rem; }
+  .win-panel h2 { margin: 0; font-size: 1.15rem; }
+  .win-detail { margin-bottom: 6px; }
+  .play-screen.is-won .board-wrap { min-height: 72px; }
+  /* Short phones: give the board the height; every control keeps a 44 px touch target. */
+  .screen { gap: 6px; padding-top: calc(4px + var(--safe-top)); padding-bottom: calc(6px + var(--safe-bottom)); }
+  .topbar { min-height: 48px; }
+  .tip { font-size: 0.85rem; padding: 4px 10px; }
+  .t-cell { width: 16px; height: 16px; }
+  .target-card { padding: 5px; }
+  .moves-num { font-size: 1.3rem; }
+  .goals { font-size: 0.78rem; }
+  .message { min-height: 2.4em; font-size: 0.85rem; }
+  .action-btn { min-height: 46px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .tile.is-hint { box-shadow: 0 0 0 5px var(--accent); }
+}
+
+/* ---------- chapters ---------- */
+.summary { display: flex; flex-direction: column; gap: 6px; }
+.bar { display: block; height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.chapter-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.chapter-card {
+  width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; text-align: left;
+  padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer;
+}
+.chapter-card.is-locked { opacity: 0.55; cursor: default; }
+.chapter-card.is-done { border-color: var(--gold); }
+.chapter-num {
+  flex: none; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--surface-2); font-weight: 800; font-size: 1.05rem;
+}
+.chapter-card.is-done .chapter-num { background: var(--gold); color: #2a1f00; }
+.chapter-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.chapter-title { font-weight: 700; }
+.chapter-blurb { font-size: 0.82rem; color: var(--muted); }
+.chapter-meta { display: flex; align-items: center; gap: 8px; }
+.chapter-meta .bar { flex: 1; }
+.chapter-count { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
+/* ---------- tutorial coach, new-rule cards, highlights ---------- */
+.coach {
+  margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--surface-2);
+  border: 2px solid var(--accent); display: flex; flex-direction: column; gap: 6px;
+}
+.coach[hidden] { display: none; }
+.coach-title { margin: 0; font-weight: 800; color: var(--accent); font-size: 0.95rem; }
+.coach-text { margin: 0; font-size: 0.95rem; line-height: 1.35; }
+.coach-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.primary.small, .secondary.small { min-height: 44px; font-size: 0.95rem; padding: 0 14px; }
+.coach-actions .primary.small { flex: 1; }
+
+/* Highlighted by the coach: a white ring (the hint glow is gold). */
+.tile.spot { z-index: 2; animation: spot-pulse 1.2s ease-in-out infinite; }
+@keyframes spot-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px #fff, 0 0 12px 3px rgba(255, 255, 255, 0.55); }
+  50% { box-shadow: 0 0 0 6px #fff, 0 0 20px 6px rgba(255, 255, 255, 0.3); }
+}
+.slot.hole.spot { border: 3px dashed rgba(255, 255, 255, 0.85); background: rgba(255, 255, 255, 0.06); }
+.target-card.spot, .action-btn.spot { outline: 3px solid #fff; outline-offset: 3px; animation: spot-outline 1.2s ease-in-out infinite; }
+@keyframes spot-outline { 50% { outline-offset: 6px; } }
+
+.medal-guide { list-style: none; margin: 4px 0 10px; padding: 0; text-align: left; font-size: 0.9rem; line-height: 1.4; display: flex; flex-direction: column; gap: 4px; }
+.medal-guide li { display: grid; grid-template-columns: 3.4em 1fr; align-items: baseline; }
+.medal-guide .stars { letter-spacing: 1px; }
+.medal-guide .medal-gold { color: var(--gold); }
+.medal-guide .medal-silver { color: var(--silver); }
+.medal-guide .medal-bronze { color: var(--bronze); }
+
+/* ---------- how to play ---------- */
+.help-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; font-size: 1rem; }
+.help-section h2 { font-size: 1.05rem; margin: 6px 0 4px; }
+.help-section p { margin: 0 0 6px; color: var(--muted); line-height: 1.4; }
+.help-section .medal-guide { color: var(--muted); }
+.help-screen .cta { margin-top: 8px; }
+.privacy-section { margin-top: 18px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.privacy-section p { font-size: 0.9rem; }
+.help-link { color: var(--accent); overflow-wrap: anywhere; display: inline-block; min-height: 44px; padding: 12px 0; line-height: 1.4; box-sizing: border-box; }
+/* The finished tutorial: the panel needs the room the target and goals used. */
+.tutorial-screen.is-won .info-row, .tutorial-screen.is-won .board-wrap { display: none; }
+.tutorial-screen .win-panel .win-detail { margin-bottom: 8px; }
+.tutorial-screen .win-actions .secondary { grid-column: 1 / -1; }
+
+/* While a card is explaining, the empty message line gives its reserved room to the board. */
+.coach:not([hidden]) ~ .message:empty { min-height: 0; }
+
+@media (max-height: 640px) {
+  .coach { padding: 5px 10px; gap: 4px; }
+  .coach-title, .coach-text { font-size: 0.85rem; line-height: 1.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile.spot { box-shadow: 0 0 0 5px #fff; }
+}
+
+/* ---------- hints and the optional rewarded ad ---------- */
+.hint-btn.is-empty .btn-label { color: var(--muted); }
+.ad-offer {
+  padding: 14px 16px; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--line);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.35); text-align: center;
+}
+.ad-offer h2 { margin: 2px 0 6px; font-size: 1.15rem; }
+.ad-text { margin: 0 0 12px; color: var(--muted); line-height: 1.35; }
+.ad-actions { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.privacy-choices { width: 100%; margin: 4px 0 8px; }
+
+/* 1.3.4 Settings: one column of full-width rows, each at least 52 px (48 dp targets). */
+.settings-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.settings-row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; font-size: 1rem; }
+.settings-list .privacy-choices { margin: 0; }
+/* 1.3.6: Privacy policy / Terms / Support rows are links styled exactly like the other settings rows */
+a.settings-row { box-sizing: border-box; color: inherit; text-decoration: none; }
+a.settings-row:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.settings-state { color: var(--muted); }
+/* 1.3.5 fix round 1 (review j1130 D4): every switch row shows "On" in the accent colour, not only Sound effects */
+.settings-row[role="switch"][aria-checked="true"] .settings-state { color: var(--accent); }
+.settings-version { margin: 6px 0; text-align: center; color: var(--muted); }
+.settings-row.danger { color: #ff9b8f; border-color: rgba(255, 155, 143, 0.5); }
+.settings-row:disabled { opacity: 0.5; cursor: default; }
+
+/* 1.3.4 reset confirmation: an alertdialog over the screen. */
+.dialog-backdrop {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px;
+  background: rgba(8, 10, 24, 0.72);
+}
+.dialog {
+  width: 100%; max-width: 420px; padding: 18px 18px 16px; border-radius: 20px;
+  background: var(--surface-2); border: 1px solid var(--line); box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+}
+.dialog-title { margin: 0 0 8px; font-size: 1.15rem; }
+.dialog-body { margin: 0 0 14px; color: var(--muted); line-height: 1.4; }
+.dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dialog-actions .danger { color: #ff9b8f; border-color: rgba(255, 155, 143, 0.5); }
+@media (max-width: 340px) { .dialog-actions { grid-template-columns: 1fr; } }

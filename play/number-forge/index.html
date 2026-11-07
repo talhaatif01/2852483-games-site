@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Number Forge · Tivexa</title><link rel="stylesheet" href="launch-audio.css"><link rel="stylesheet" href="style.css"></head>
+<body>
+<main id="app">
+  <section id="levels-screen" class="screen" hidden aria-labelledby="levels-title">
+    <header class="topbar"><span class="brand" aria-label="Tivexa Studios">TIVEXA <small>STUDIOS</small></span><button id="menu-button" type="button" aria-haspopup="dialog">☰ Menu</button></header>
+    <h1 id="levels-title">Number Forge</h1>
+    <div class="progress-row"><span id="progress-text"></span><div class="bar" role="progressbar" aria-label="Campaign progress" aria-valuemin="0" aria-valuemax="100"><span id="progress-fill"></span></div></div>
+    <button id="endless" type="button" class="endless-card"><span class="endless-name">Endless Forge</span><span id="endless-info" class="endless-info"></span></button>
+    <div id="chapters"></div>
+    <p class="note" id="levels-note">Offline · progress stays on this device · ads are simulated in this build</p>
+  </section>
+  <section id="play-screen" class="screen" hidden aria-labelledby="play-title">
+    <header class="playbar"><button id="back" type="button" aria-label="Back to levels">‹ Levels</button><h2 id="play-title"></h2><button id="restart" type="button" aria-label="Restart this game">↺ Restart</button></header>
+    <div class="hud" aria-live="polite"><div><span class="hud-label">SCORE</span><strong id="hud-score">0</strong></div><div><span class="hud-label" id="hud-goal-label">GOAL</span><strong id="hud-goal"></strong></div><div><span class="hud-label" id="hud-moves-label">MOVES</span><strong id="hud-moves">0</strong></div></div>
+    <div id="ad-banner" class="ad-banner" role="status" hidden></div>
+    <div id="board" class="board" aria-label="Number board: swipe to combine equal tiles"></div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+<dialog id="menu" class="sheet"><h2>Menu</h2><div id="menu-toggles"></div><button id="menu-privacy" type="button" class="row-link" hidden>Privacy choices <span aria-hidden="true">›</span></button><a id="privacy-link" class="row-link" href="https://tivexa.games/number-forge/privacy/" target="_blank" rel="noopener">Privacy policy <span aria-hidden="true">↗</span></a><a id="terms-link" class="row-link" href="https://tivexa.games/terms/" target="_blank" rel="noopener">Terms <span aria-hidden="true">↗</span></a><a id="support-link" class="row-link" href="https://tivexa.games/support/" target="_blank" rel="noopener">Support <span aria-hidden="true">↗</span></a><section id="more-games" class="more-games" hidden aria-labelledby="more-games-title"><h3 id="more-games-title">More Tivexa games</h3><div id="more-games-list"></div><a id="all-games" class="all-games row-link" href="https://play.google.com/store/apps/dev?id=7595142451480358679" target="_blank" rel="noopener">All Tivexa games <span aria-hidden="true">↗</span></a></section><button id="reset-progress" type="button" class="danger">Reset progress</button><button id="menu-close" type="button">Close</button></dialog>
+<dialog id="confirm-reset" class="sheet"><h2>Reset all progress?</h2><p>All solved challenges and your Endless Forge bests are erased. Sound settings stay.</p><button id="reset-yes" type="button" class="danger">Yes, reset</button><button id="reset-no" type="button">Cancel</button></dialog>
+<dialog id="win" class="sheet"><p class="kicker">NICELY DONE</p><h2 id="win-title">Challenge complete</h2><p id="win-text"></p><button id="win-next" type="button" class="primary">Next challenge</button><button id="win-levels" type="button">Levels</button></dialog>
+<dialog id="stuck" class="sheet"><p class="kicker" id="stuck-kicker">THE FORGE IS FULL</p><h2 id="stuck-title">No moves left</h2><p id="stuck-text"></p><button id="stuck-second" type="button" class="second-chance" hidden>Second chance: undo your last swipe</button><p id="stuck-second-note" class="fine" hidden></p><button id="stuck-retry" type="button" class="primary">Try again (free)</button><button id="stuck-levels" type="button">Levels</button></dialog>
+<dialog id="endless-over" class="sheet"><p class="kicker" id="eo-kicker">ENDLESS FORGE</p><h2 id="eo-title">Game over</h2><p id="eo-text"></p><button id="endless-over-second" type="button" class="second-chance" hidden>Second chance: undo your last swipe</button><p id="endless-over-second-note" class="fine" hidden></p><button id="eo-again" type="button" class="primary">Play again (free)</button><button id="eo-levels" type="button">Levels</button></dialog>
+<dialog id="ad" class="sheet ad-sheet"><span class="ad-label">ADVERTISEMENT · SIMULATED</span><h2>A little break</h2><p>This is a local placeholder, not a real ad. Your board is saved exactly as it is.</p><p id="ad-timer" class="ad-timer"></p><button id="ad-skip" type="button" disabled>Skip</button><button id="ad-close" type="button" disabled>Close</button></dialog>
+<dialog id="rw" class="sheet ad-sheet"><span class="ad-label">REWARDED AD · SIMULATED</span><h2>Second chance</h2><p>Watch to the end to undo your last swipe. Skipping gives no reward; your board stays as it is.</p><p id="rw-timer" class="ad-timer"></p><button id="rw-skip" type="button" disabled>Skip (no reward)</button><button id="rw-close" type="button" disabled>Close</button></dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+<script src="launch-audio.js"></script><script src="rules.js"></script><script src="levels.js"></script><script src="catalog.js"></script><script src="app.js"></script>
+</body></html>

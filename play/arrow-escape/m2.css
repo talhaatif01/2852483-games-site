@@ -1,0 +1,65 @@
+/* Arrow Escape M2 (job 1083): every control at least 44 CSS px (the M1 logged defect), level chips in a grid of at least
+   44 px cells, Restart / Undo / Level menu above the board (above the fold at 360x780), a smaller cube board on short
+   phones so the controls stay in view. */
+.cube-mode button{min-height:44px;min-width:44px}
+.cube-mode header{align-items:center}
+#menu-button{margin-left:auto;min-height:44px;padding:0 16px}
+.cube-mode .levels{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))!important;gap:6px!important}
+.cube-mode .levels button{min-height:44px;padding:0;font-size:13px}
+.cube-mode .actions{margin:8px 0 10px;gap:8px}
+.cube-mode .actions button{min-height:44px;padding:0 18px}
+.cube-mode #controls button{min-height:44px}
+dialog button{min-height:44px}
+/* RC D3 (job 1103): every card (Menu, out of lives, level complete) has the same 16 px minimum side margins, width and
+   24 px rounded corners at every size (tests/cards.js). */
+dialog#sound-menu,dialog#lives,dialog#complete{box-sizing:border-box!important;width:min(430px,calc(100vw - 32px))!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;border-radius:24px!important;max-height:calc(100vh - 32px);overflow-y:auto}
+/* RC layout (job 1118, owner relay 0029/0030): Menu / Levels / Play screens; the play screen is the cube + HUD only. */
+.screen[hidden]{display:none!important}
+.cube-mode main{max-width:960px}
+#menu-screen,#levels-screen{margin:16px auto;max-width:640px}
+#menu-screen h1{font-size:clamp(30px,8vw,46px);margin:18px 0 6px;color:#344260}
+.muted{color:#6c7090;margin:0 0 16px}
+#play-btn{display:block;width:100%;min-height:56px;font-size:18px;margin:6px 0 18px;background:#8c79d9;color:#fff;border-color:#8c79d9;border-radius:16px}
+#menu-toggles{margin:0 0 14px}
+/* fix round 2 (review j1133 D3): Privacy choices is a .row-btn like How to play / Privacy policy / Terms */
+#menu-privacy[hidden]{display:none!important}
+.row-btn{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;margin:0 0 10px;padding:0 16px;box-sizing:border-box;border:1px solid #d4d8ec;border-radius:14px;background:#fff;color:#344260;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.row-btn span{color:#8c79d9;font-size:20px}
+dialog#help-card{box-sizing:border-box!important;width:min(430px,calc(100vw - 32px))!important;max-width:none!important;margin:auto!important;border-radius:24px!important}
+.how{margin:8px 0 12px;color:#4b5573}.how summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700}
+.topbar,.playbar{display:flex;align-items:center;gap:12px;min-height:52px}
+.topbar h2{margin:0;font-size:20px;color:#344260}
+#levels-screen .levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr))!important;gap:8px!important}
+#play-screen{display:flex;flex-direction:column;min-height:calc(100svh - 24px);padding:6px 12px 8px;max-width:960px;margin:0 auto}
+.playbar{justify-content:space-between}.playbar strong{color:#344260;font-size:16px;text-align:center;flex:1}
+#counter{font-weight:800;color:#c0536e;white-space:nowrap}
+#play-screen .actions{display:flex;justify-content:center;gap:10px;margin:4px 0 6px}
+/* an explicit height (not flex auto) so the SVG's 100% height resolves and its viewBox letterboxes inside the board */
+#play-screen #board{display:block;flex:none;height:max(300px,calc(100svh - 230px))!important;min-height:300px!important;width:100%}
+#play-screen #board svg.cube-svg{width:100%;height:100%}
+#controls{display:flex;justify-content:flex-end;margin:4px 0 0}
+#controls button{min-height:44px;font-size:13px;padding:0 14px;opacity:.85}
+#status{min-height:20px;margin:4px 0 0;text-align:center;font-size:13px;color:#6c7090}
+@media(max-width:420px){.cube-mode #board{height:clamp(300px,46vh,520px)!important;min-height:300px!important}.cube-mode header{padding:10px 16px}.cube-mode .lab{padding-top:14px}}
+
+/* 1.0.1 (review j1148 D2): Begin label contrast to WCAG AA (white on #9e5266, about 5.5:1; e2e prints the measured ratio) */
+.la-launch{--la-accent:#9e5266}
+/* 1.0.1 (D3): every Menu row uses the same row style (left label; chevron when it opens something, arrow when it leaves) */
+#menu-screen .row-btn{background:#fff;border:1px solid #d4d8ec;color:#344260;font-size:16px;font-weight:700;text-align:left}
+#menu-screen .row-btn:hover{background:#f6f5fd}
+/* 1.0.1 (R6): More Tivexa games */
+.more-games{margin:16px 0 4px}.more-games h2{font-size:15px;margin:0 0 8px;color:#344260}
+.promo-card{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 12px;border:1px solid #d4d8ec;border-radius:14px;background:#fff;color:#344260;text-decoration:none;margin-bottom:8px}
+.promo-card img{border-radius:12px}.promo-card strong{display:block}.promo-card small{color:#6c7090}
+.all-games{display:inline-flex;align-items:center;min-height:44px;color:#344260;font-weight:700}
+/* 1.0.1 B3 (owner relay 0060): the Play-screen top bar uses the Menu-row card style: Levels / Restart / Undo are white cards
+   with an icon + label, the level title and the life bank sit on one card row; 10 px gaps; the screen's 16 px side margin
+   is unchanged (no negative margins, nothing wider than the screen content box). */
+#play-screen .playbar{gap:10px;padding:6px 8px;margin:0 0 8px;border:1px solid #d4d8ec;border-radius:14px;background:#fff;box-sizing:border-box}
+#play-screen .bar-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid #d4d8ec;border-radius:12px;background:#fff;color:#344260;font:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:none}
+#play-screen .bar-btn:hover{background:#f6f5fd}#play-screen .bar-btn:disabled{opacity:.45;cursor:default}
+#play-screen .bar-ico{color:#8c79d9;font-size:18px;line-height:1}
+#play-screen .bar-title{color:#344260;font-size:16px;font-weight:800;text-align:center;flex:1;min-width:0}
+#play-screen .bar-lives{font-weight:800;color:#c0536e;white-space:nowrap;padding:0 6px}
+#play-screen .actions{display:flex;justify-content:center;gap:10px;margin:0 0 6px}
+#play-screen .actions .bar-btn{flex:1;max-width:180px}
