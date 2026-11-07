@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sortwise</title>
+  <meta name="description" content="Sortwise - a calm sorting puzzle. Free, no purchases, no account." />
+  <!-- QA sortwise-j292 D2: dark from the very first frame, before styles.css loads -->
+  <style>html, body { background: #161b33; }</style>
+  <link rel="stylesheet" href="launch-audio.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" role="main"></div>
+  <!-- 1.3.5: the shared Tivexa launch/audio module (a classic script, so it is ready before the game module runs) -->
+  <script src="launch-audio.js"></script>
+  <script type="module" src="src/ui/main.js"></script>
+</body>
+</html>
