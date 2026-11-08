@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="canonical" href="https://tivexa.games/play/number-forge/">
+<title>Play Number Forge free in your browser · Tivexa</title>
+<meta name="description" content="Number Forge is a merge puzzle: swipe to slide every tile, matching numbers combine, and you forge the goal tile before your moves run out. Play free in your browser.">
+<meta property="og:title" content="Play Number Forge free in your browser">
+<meta property="og:description" content="Merge numbers to forge the target tile. 50 challenges, no timer.">
+<meta property="og:image" content="https://tivexa.games/assets/tivexa-og.webp">
+<meta property="og:url" content="https://tivexa.games/play/number-forge/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#071b15">
+<link rel="icon" href="../../assets/tivexa-logo-512.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#071b15; --bg-2:#0b2a21; --bg-3:#10382c;
+    --ink:#f2efe6; --ink-dim:#b7c3bb; --ink-faint:#7f9088;
+    --gold:#e8c877; --gold-2:#c9a24d;
+    --line:rgba(232,200,119,.16); --card:rgba(255,255,255,.035);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); min-height:100vh;
+    font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(900px 600px at 15% -10%, rgba(232,200,119,.07), transparent 60%),
+      radial-gradient(700px 500px at 100% 0%, rgba(125,255,156,.05), transparent 60%);
+  }
+  h1,h2{font-family:Fraunces,Georgia,serif; font-weight:700; letter-spacing:-.01em; margin:0}
+  a{color:inherit}
+
+  .nav{border-bottom:1px solid var(--line); background:rgba(7,27,21,.72); backdrop-filter:blur(14px); position:sticky; top:0; z-index:5}
+  .nav .wrap{width:min(1180px,100% - 32px); margin-inline:auto; display:flex; align-items:center; gap:22px; height:62px}
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none; font-family:Fraunces,serif; font-weight:700; font-size:1.15rem; letter-spacing:.06em; margin-right:auto}
+  .brand img{width:32px; height:32px; border-radius:9px}
+  .nav a.link{font-size:.9rem; color:var(--ink-dim); text-decoration:none}
+  .nav a.link:hover{color:var(--gold)}
+
+  .shell{width:min(1180px,100% - 32px); margin:0 auto; padding:26px 0 48px;
+         display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:38px; align-items:start}
+
+  /* the game, framed deliberately */
+  .stage{
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-3));
+    border:1px solid var(--line); border-radius:22px; padding:14px;
+    box-shadow:0 30px 70px rgba(0,0,0,.45);
+  }
+  .frame{
+    position:relative; width:100%; aspect-ratio:412/915; max-height:78vh;
+    margin-inline:auto; border-radius:14px; overflow:hidden; background:#121a2e;
+  }
+  /* the game is a portrait column; cap its width so it reads as a device, not a stretched page */
+  .frame{max-width:460px}
+  iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block}
+
+  .stagebar{display:flex; align-items:center; gap:12px; padding:10px 6px 2px}
+  .stagebar .lbl{font-size:.8rem; color:var(--ink-faint); margin-right:auto}
+  .btn{
+    appearance:none; border:1px solid var(--line); background:var(--card); color:var(--ink);
+    font:inherit; font-size:.86rem; font-weight:600; padding:8px 14px; border-radius:999px; cursor:pointer;
+  }
+  .btn:hover{border-color:var(--gold-2); color:var(--gold)}
+  .btn.gold{background:var(--gold); color:#20160a; border-color:transparent}
+  .btn.gold:hover{background:#f0d58f; color:#20160a}
+
+  /* side panel */
+  aside h1{font-size:1.9rem; margin-bottom:6px}
+  .tagline{color:var(--gold); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; font-weight:600; margin-bottom:10px}
+  aside p{color:var(--ink-dim); margin:0 0 14px}
+  .facts{list-style:none; padding:0; margin:18px 0 0; border-top:1px solid var(--line)}
+  .facts li{display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); font-size:.92rem; color:var(--ink-dim)}
+  .facts b{color:var(--ink); font-weight:600; min-width:92px; flex:none}
+  .cta{display:flex; flex-wrap:wrap; gap:10px; margin-top:20px}
+  .note{margin-top:18px; font-size:.82rem; color:var(--ink-faint)}
+  .more{margin-top:26px; padding-top:18px; border-top:1px solid var(--line)}
+  .more h2{font-size:1rem; margin-bottom:10px}
+  .more a{display:block; text-decoration:none; color:var(--ink-dim); font-size:.92rem; padding:7px 0}
+  .more a:hover{color:var(--gold)}
+
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr; gap:26px; padding-top:18px}
+    .frame{max-width:none; max-height:none; aspect-ratio:412/820}
+    aside h1{font-size:1.6rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="nav"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../assets/tivexa-logo-512.png" alt="">TIVEXA</a>
+  <a class="link" href="../../#games">Games</a>
+  <a class="link" href="../../#browser">Play free</a>
+  <a class="link" href="../../support/">Support</a>
+</div></div>
+
+<main class="shell">
+
+  <div>
+    <div class="stage">
+      <div class="frame">
+        <iframe id="game" src="game/" title="Number Forge" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+      <div class="stagebar">
+        <span class="lbl">Runs in this tab &middot; nothing to install</span>
+        <button class="btn" id="restart" type="button">Reload</button>
+        <button class="btn" id="full" type="button">Fullscreen</button>
+      </div>
+    </div>
+  </div>
+
+  <aside>
+    <p class="tagline">Free in your browser</p>
+    <h1>Number Forge</h1>
+    <p>Swipe to slide every tile at once. Two equal numbers merge into their sum. Forge the goal tile before your moves run out — every challenge is set by hand and checked solvable.</p>
+
+    <ul class="facts">
+      <li><b>Challenges</b><span>50 hand-set goals across 10 chapters, each verified solvable within its move limit</span></li>
+      <li><b>Controls</b><span>Swipe, or use the arrow keys</span></li>
+      <li><b>Boards</b><span>They grow from 2&times;2 to 4&times;4, and goals climb all the way to 1024</span></li>
+      <li><b>Endless Forge</b><span>Unlocks after chapter 1 &mdash; no move limit, just how far you can get</span></li>
+      <li><b>Saving</b><span>Progress is kept in this browser, on this device</span></li>
+    </ul>
+
+    <div class="cta">
+      <a class="btn gold" href="https://play.google.com/store/apps/details?id=com.tivexa.numberforge">Get it on Google Play</a>
+      <a class="btn" href="../../#games">All Tivexa games</a>
+    </div>
+
+    <p class="note">This browser version has no ads and no purchases. It's the same game as the Android app, running in the page.</p>
+
+    <div class="more">
+      <h2>More from Tivexa</h2>
+      <a href="../sortwise/">Sortwise &mdash; swap tiles until the board matches the picture</a>
+      <a href="../signal-garden/">Signal Garden &mdash; light the garden by turning circuit tiles</a>
+      <a href="../../#games">Arrow Escape &mdash; clear a cube of arrows, one direction at a time</a>
+    </div>
+  </aside>
+
+</main>
+
+<script>
+  (function(){
+    var f = document.getElementById('game');
+    document.getElementById('restart').addEventListener('click', function(){
+      f.src = f.src;
+    });
+    document.getElementById('full').addEventListener('click', function(){
+      var el = f.parentElement;
+      if (document.fullscreenElement) { document.exitFullscreen(); return; }
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (f.requestFullscreen) f.requestFullscreen();
+    });
+  })();
+</script>
+
+</body>
+</html>
