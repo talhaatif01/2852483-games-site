@@ -27,8 +27,8 @@ catch {
     storage = null;
 }
 const native = nativeCall();
-// Tiltwise's own policy (live, verified HTTP 200). Players only ever see the label, never the host.
-const PRIVACY_POLICY_URL = "https://talhaatif01.github.io/2852483-games-site/tiltwise/privacy/";
+// Tiltwise's own policy on the branded domain (checked live). Players only ever see the label, never the host.
+const PRIVACY_POLICY_URL = "https://tivexa.games/tiltwise/privacy/";
 const save = new DurableSave(PROGRESS_SPEC, storage, native);
 const ads = createAdsProvider(native, "TiltwayAds") ?? (simulatedAdsEnabled() ? simulatedAdsProvider() : null);
 const adsMode = !ads ? "none" : globalThis.studioTestAds ? "test" : native ? "native" : "simulated";
