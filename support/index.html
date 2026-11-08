@@ -3,15 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tivexa Support - Sortwise</title>
+<title>Tivexa Support</title>
+<meta name="description" content="Help, bug reports and common questions for TIVEXA games: Sortwise, Signal Garden, Number Forge, Arrow Escape and First Out.">
 <style>
   :root{--bg:#f6f5f2; --surface:#ffffff; --ink:#1c2024; --ink-dim:#5b6268; --line:#d8d6d0; --accent:#1f4d5c;}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15181a; --surface:#1b1f22; --ink:#e8e9e7; --ink-dim:#9aa1a6; --line:#2d3236; --accent:#7fb3c2; color-scheme:dark;}}
   :root[data-theme="dark"]{--bg:#15181a; --surface:#1b1f22; --ink:#e8e9e7; --ink-dim:#9aa1a6; --line:#2d3236; --accent:#7fb3c2; color-scheme:dark;}
   *{box-sizing:border-box} body{margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; padding-inline:16px; max-width:720px; margin-inline:auto; padding-block:0 48px;}
-  h1,h2,h3{font-weight:600} h2{font-size:1.15rem; margin:32px 0 8px} p,li{line-height:1.65; max-width:64ch; overflow-wrap:anywhere}
+  h1,h2,h3{font-weight:600} h2{font-size:1.15rem; margin:32px 0 8px} h3{font-size:1rem; margin:26px 0 6px}
+  p,li{line-height:1.65; max-width:64ch; overflow-wrap:anywhere}
   a{color:var(--accent)}
-  nav{position:sticky; top:0; display:flex; gap:6px 18px; flex-wrap:wrap; align-items:center; padding-block:14px; margin-bottom:8px; background:var(--bg); border-bottom:1px solid var(--line);}
+  nav{position:sticky; top:0; display:flex; gap:6px 18px; flex-wrap:wrap; align-items:center; padding-block:14px; margin-bottom:8px; background:var(--bg); border-bottom:1px solid var(--line); z-index:2}
   nav a{font-size:0.82rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-dim); text-decoration:none; padding-block:6px}
   nav a:hover{color:var(--accent)} nav .org{margin-right:auto; font-weight:600; color:var(--ink); font-size:0.95rem}
   section{padding-block:28px}
@@ -19,6 +21,10 @@
   .meta{color:var(--ink-dim); font-size:0.9rem}
   .box{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:18px 20px; margin-top:16px}
   .box p{margin:6px 0}
+  .games{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; padding:0; list-style:none}
+  .games a{display:inline-block; border:1px solid var(--line); border-radius:999px; padding:6px 14px; text-decoration:none; font-size:0.9rem; background:var(--surface)}
+  .game{border-top:1px solid var(--line); padding-top:4px; margin-top:34px; scroll-margin-top:72px}
+  .game h2{margin-top:18px}
   footer{padding-block:28px; color:var(--ink-dim); font-size:0.78rem; border-top:1px solid var(--line)}
   :root{--bg:#071b15; --surface:#0f2d24; --ink:#f2efe6; --ink-dim:#b7c3bb; --line:rgba(232,200,119,.18); --accent:#e8c877; color-scheme:dark}
   nav .org{display:flex; align-items:center; gap:10px; text-decoration:none; font-family:Georgia,serif; letter-spacing:.06em} nav .org img{width:28px;height:28px;border-radius:8px}
@@ -29,21 +35,71 @@
 <section>
   <div class="eyebrow">Get in touch</div>
   <h1>Tivexa Support</h1>
-  <p class="meta">Sortwise</p>
-  <p>For help, bug reports or questions about Sortwise, email us. It helps to include your phone model, Android version and Sortwise version (Settings &gt; Apps &gt; Sortwise), and the level you were playing.</p>
+  <p>For help, bug reports or questions about any TIVEXA game, email us. It helps to include the game's name, your phone model, your Android version, the app version (Settings &gt; Apps &gt; the game &gt; App details) and the level you were playing.</p>
   <div class="box">
     <p><strong>Email:</strong> <a href="mailto:admin.tivexa@protonmail.com">admin.tivexa@protonmail.com</a></p>
     <p><strong>Publisher:</strong> 2852483 Alberta Inc.<br>2852483 Alberta Inc., Mailbox #456, 105-7655 Edmonds Street, Burnaby, BC V3N 0C3, Canada</p>
   </div>
+  <ul class="games">
+    <li><a href="#sortwise">Sortwise</a></li>
+    <li><a href="#signal-garden">Signal Garden</a></li>
+    <li><a href="#number-forge">Number Forge</a></li>
+    <li><a href="#arrow-escape">Arrow Escape</a></li>
+    <li><a href="#first-out">First Out</a></li>
+  </ul>
 
-  <h2>Common questions</h2>
-  <p><strong>Do I need an internet connection or an account?</strong> No. Sortwise plays offline and has no account. Only the optional ads for extra hints need a connection.</p>
-  <p><strong>Where is my progress saved?</strong> Only on your device. We cannot see it or restore it for you. If Android backup is on, Android may restore it on a new device.</p>
-  <p><strong>How do I reset my progress?</strong> Settings &gt; Apps &gt; Sortwise &gt; Storage &gt; Clear storage. This deletes all medals and cannot be undone.</p>
-  <p><strong>How do I see the tutorial again?</strong> Open How to play on the chapter list and tap Replay the tutorial.</p>
-  <p><strong>Does Sortwise have ads or purchases?</strong> No purchases. Each level has 5 free hints; when they are used up you can choose to watch an ad to earn 1 more hint for that level (version 1.2.0 and later). A small banner is also shown at the bottom of the menu screens (chapter list, chapter screens, How to play), never during a puzzle or the tutorial.</p>
-  <p><strong>How do I change my ad privacy choices?</strong> Open How to play and tap Privacy choices (shown where your region requires it). You can also reset or delete your advertising ID in Android settings.</p>
-  <p>Read the <a href="../privacy/">Sortwise Privacy Policy</a>.</p>
+  <h2>Questions about every game</h2>
+  <p><strong>Do I need an internet connection or an account?</strong> No. Our games have no account and no sign-in, and they play offline. Only the optional ads need a connection.</p>
+  <p><strong>Where is my progress saved?</strong> Only on your device, in the app's own private storage. We cannot see it or restore it for you.</p>
+  <p><strong>Are there in-app purchases?</strong> No. None of our games sell anything.</p>
+  <p><strong>Can I play without ads?</strong> Every game can be finished without watching a single ad. Nothing in a game is locked behind one. Where your region offers it, you can also turn ads off from the game's "Ads and privacy choices" screen.</p>
+
+  <div class="game" id="sortwise">
+    <h2>Sortwise</h2>
+    <p><strong>How do I reset my progress?</strong> "Reset all progress" in Options, or Settings &gt; Apps &gt; Sortwise &gt; Storage &gt; Clear storage. This deletes all medals and cannot be undone.</p>
+    <p><strong>How do I see the tutorial again?</strong> Open How to play on the chapter list and tap Replay the tutorial.</p>
+    <p><strong>Does Sortwise have ads?</strong> No purchases. Each level has 5 free hints; when they are used up you can choose to watch an ad to earn 1 more hint for that level (version 1.2.0 and later). A small banner is also shown at the bottom of the menu screens (chapter list, chapter screens, How to play), never during a puzzle or the tutorial. There are no full-screen ads.</p>
+    <p><strong>How do I change my ad privacy choices?</strong> Open How to play and tap Privacy choices (shown where your region requires it).</p>
+    <p><strong>Will my progress move to a new device?</strong> If Android backup is on, Android may restore it on a new device.</p>
+    <p>Read the <a href="../sortwise/privacy/">Sortwise Privacy Policy</a>.</p>
+  </div>
+
+  <div class="game" id="signal-garden">
+    <h2>Signal Garden</h2>
+    <p><strong>How do I reset my progress?</strong> "Reset all progress" in Options, or Settings &gt; Apps &gt; Signal Garden &gt; Storage &gt; Clear storage. This cannot be undone.</p>
+    <p><strong>Does Signal Garden have ads?</strong> Only a small banner below the puzzle. There are no ads between levels, no full-screen ads, no rewarded ads and no in-app purchases.</p>
+    <p><strong>How do I change my ad privacy choices?</strong> Open the app's "Ads and privacy choices" screen, where you can also turn the banner off. The game and all hints work the same with ads off.</p>
+    <p><strong>Will my progress move to a new device?</strong> If Android backup is on, Android may restore it on a new device.</p>
+    <p>Read the <a href="../signal-garden/privacy/">Signal Garden Privacy Policy</a>.</p>
+  </div>
+
+  <div class="game" id="number-forge">
+    <h2>Number Forge</h2>
+    <p><strong>How do I reset my progress?</strong> "Reset progress" in the Menu, or Settings &gt; Apps &gt; Number Forge &gt; Storage &gt; Clear storage. This cannot be undone.</p>
+    <p><strong>Does Number Forge have ads?</strong> A banner below the board, separated from the game controls; an occasional full-screen interstitial ad that appears only after about three minutes of active play, with a 10-second on-screen notice first; and an optional rewarded ad you can choose to watch. There are no hints for sale, rewarded ads are always optional, and Restart is always available.</p>
+    <p><strong>How do I change my ad privacy choices?</strong> Open the app's "Ads and privacy choices" screen, where your region offers it. The game plays the same with ads off.</p>
+    <p><strong>Will my progress move to a new device?</strong> If Android backup is on, Android may restore it on a new device.</p>
+    <p>Read the <a href="../number-forge/privacy/">Number Forge Privacy Policy</a>.</p>
+  </div>
+
+  <div class="game" id="arrow-escape">
+    <h2>Arrow Escape</h2>
+    <p><strong>How do I reset my progress?</strong> "Reset progress" in the Menu, or Settings &gt; Apps &gt; Arrow Escape &gt; Storage &gt; Clear storage. This cannot be undone.</p>
+    <p><strong>Does Arrow Escape have ads?</strong> A banner below the cube, separated from the game controls; an occasional full-screen interstitial ad only at a natural level break after about three minutes of active play, with a 10-second on-screen notice first; and an optional rewarded ad for extra lives. There are no hints for sale, the only thing an ad can give you is extra lives, and restarting is always free.</p>
+    <p><strong>How do I change my ad privacy choices?</strong> Open the app's "Ads and privacy choices" screen, where your region offers it. The game plays the same with ads off.</p>
+    <p><strong>Will my progress move to a new device?</strong> If Android backup is on, Android may restore it on a new device.</p>
+    <p>Read the <a href="../arrow-escape/privacy/">Arrow Escape Privacy Policy</a>.</p>
+  </div>
+
+  <div class="game" id="first-out">
+    <h2>First Out</h2>
+    <p><strong>How do I reset my progress?</strong> "Reset progress" in the menu, or Settings &gt; Apps &gt; First Out &gt; Storage &gt; Clear storage. This cannot be undone.</p>
+    <p><strong>Does First Out have ads?</strong> A banner below the puzzle area, separated from the game controls; an occasional full-screen ad between levels; and optional ads you choose to watch yourself. There are no in-app purchases. Every level, every hint and Undo work exactly the same whether or not you see or watch an ad.</p>
+    <p><strong>How many hints do I get?</strong> Two per level.</p>
+    <p><strong>How do I change my ad privacy choices?</strong> Open the app's "Ads and privacy choices" screen.</p>
+    <p><strong>Will my progress move to a new device?</strong> No. First Out opts out of Android app backup, so your progress is not included in device backups and does not transfer to a new device.</p>
+    <p>Read the <a href="../first-out/privacy/">First Out Privacy Policy</a>.</p>
+  </div>
 </section>
 <footer>&copy; 2026 TIVEXA &middot; published by 2852483 Alberta Inc., Alberta, Canada</footer>
 </body>
