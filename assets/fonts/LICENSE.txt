@@ -1,0 +1,6 @@
+Self-hosted web fonts used on tivexa.games (Latin subsets, converted to WOFF):
+
+Poppins (poppins-700.woff) - Copyright 2020 The Poppins Project Authors. Licensed under the SIL Open Font License, Version 1.1.
+Inter (inter-400.woff, inter-600.woff) - Copyright 2016 The Inter Project Authors. Licensed under the SIL Open Font License, Version 1.1.
+
+Full licence text: https://openfontlicense.org/open-font-license-official-text/
