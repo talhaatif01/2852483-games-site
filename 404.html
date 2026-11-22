@@ -3,23 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
-<meta name="robots" content="noindex">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Page not found | Tivexa Games</title>
+<meta name="description" content="This page could not be found.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tivexa Games">
+<meta property="og:title" content="Page not found | Tivexa Games">
+<meta property="og:description" content="This page could not be found.">
+<meta property="og:url" content="https://tivexa.games/404.html">
+<meta property="og:image" content="https://tivexa.games/assets/tivexa-share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tivexa Games: puzzle games worth one more round">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B1B2B">
 <link rel="icon" href="/assets/tivexa-logo-512.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/tivexa-logo-512.png">
+<link rel="preload" href="/assets/fonts/poppins-700.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/site.js"></script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
-  <a class="logo" href="/" aria-label="Tivexa Games home"><img src="/assets/tivexa-mark.webp" alt="" width="38" height="38"><span><b>Tivexa</b><small>GAMES</small></span></a>
+  <a class="logo" href="/" aria-label="Tivexa Games home"><img src="/assets/tivexa-mark.webp" alt="" width="40" height="40"><span><b>Tivexa</b><small>GAMES</small></span></a>
   <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><span class="vh">Menu</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-  <nav class="nav" id="site-nav" aria-label="Main"><a href="/#games">Games</a><a href="/#about">About</a><a href="/support/">Support</a></nav>
+  <nav class="nav" id="site-nav" aria-label="Main">
+    <a href="/games/">Games</a>
+    <a href="/#about">About</a>
+    <a href="/support/">Support</a>
+  </nav>
 </div></header>
-<main class="page" id="main"><div class="wrap">
+<main id="main" class="page"><div class="wrap">
   <h1>This page isn't here</h1>
-  <p>The link may be old, or the address may have a typo. You can find every game on the home page, and each game's privacy policy is listed on our Privacy page.</p>
-  <div class="btns"><a class="btn solid" href="/">Go to the home page</a><a class="btn quiet" href="/privacy/">Privacy policies</a></div>
+  <p>The link may be old, or the address may have a typo. Every game is on the Games page, and each game's privacy policy is listed on our Privacy page.</p>
+  <div class="btns"><a class="btn" href="/games/">See all games</a><a class="btn quiet" href="/privacy/">Privacy policies</a></div>
 </div></main>
+<footer class="site-foot"><div class="wrap">
+  <div class="row">
+    <a class="logo" href="/" aria-label="Tivexa Games home"><img src="/assets/tivexa-mark.webp" alt="" width="32" height="32" loading="lazy"><span><b>Tivexa</b><small>GAMES</small></span></a>
+    <nav aria-label="Footer">
+      <a href="/games/">Games</a>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/support/">Support</a>
+      <a href="mailto:admin.tivexa@protonmail.com">Contact</a>
+    </nav>
+    <div class="ext"><a href="https://www.facebook.com/tivexagames" aria-label="Tivexa Games on Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.2v2.3H7.4V14h2.8v8z"/></svg></a><a href="https://www.pinterest.com/tivexagames/" aria-label="Tivexa Games on Pinterest"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.5 2.1-.8 3.3-.2 1 .5 1.8 1.5 1.8 1.8 0 3.1-1.9 3.1-4.6 0-2.4-1.7-4.1-4.2-4.1-2.9 0-4.5 2.1-4.5 4.4 0 .9.3 1.8.8 2.3.1.1.1.2.1.3l-.3 1.2c0 .2-.2.2-.4.1-1.3-.6-2.1-2.5-2.1-4 0-3.3 2.4-6.3 6.9-6.3 3.6 0 6.4 2.6 6.4 6 0 3.6-2.3 6.5-5.4 6.5-1.1 0-2.1-.6-2.4-1.2l-.7 2.5c-.2.9-.9 2.1-1.3 2.8A10 10 0 1 0 12 2z"/></svg></a><a href="https://www.tiktok.com/@tivexagames" aria-label="Tivexa Games on TikTok"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.3 2 1.6 3.5 3.6 3.7v3a7 7 0 0 1-3.6-1.1v6.3a5.6 5.6 0 1 1-5.6-5.6l.8.1v3.1a2.6 2.6 0 1 0 1.8 2.4V3z"/></svg></a><span class="sep" aria-hidden="true"></span><a href="https://play.google.com/store/apps/developer?id=Tivexa+Studios"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#34A853" d="M3.6 2.3 13.3 12l-9.7 9.7a1.7 1.7 0 0 1-.6-1.3V3.6c0-.5.2-1 .6-1.3z"/><path fill="#FBBC04" d="m16.9 15.3-3.6-3.3 3.6-3.3 3.4 1.9c1 .6 1 1.6 0 2.2z"/><path fill="#4285F4" d="M3.6 21.7 13.3 12l3.6 3.3L5.6 22c-.8.4-1.5.2-2-.3z"/><path fill="#EA4335" d="M3.6 2.3c.5-.5 1.2-.7 2-.3l11.3 6.7L13.3 12z"/></svg>Google Play</a></div>
+  </div>
+  <div class="legal"><span>&copy; 2026 Tivexa Games</span><a href="/terms/">Terms of Service</a></div>
+</div></footer>
 </body>
 </html>
