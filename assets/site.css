@@ -283,3 +283,20 @@ p{margin:0}
 .hero{min-height:min(600px,80vh)}
 .hero .wrap{padding:48px 0 60px}
 @media (max-width:900px){.feature{grid-template-columns:1fr;gap:20px}.board-shot{padding-bottom:20px}.board-shot .mini{right:-6px;width:24%}}
+
+/* Mobile card polish (final pass): clearer store links, bigger text, roomier layout on small phones */
+@media (max-width:760px){
+  .card p{font-size:.98rem;line-height:1.55;color:#D6DCD6}
+  .card .meta{font-size:.84rem}
+  .card .links{gap:8px;padding-top:6px}
+  .card .links a{min-height:44px;padding:0 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);background:rgba(9,22,35,.45)}
+  .card .links a.alt{border-color:color-mix(in srgb,var(--mint) 55%,transparent)}
+  .card .links a:hover{text-decoration:none;background:rgba(231,192,114,.12)}
+}
+@media (max-width:440px){
+  .card,.card.big,.games-grid .card.big{grid-template-columns:1fr}
+  .card .shot{height:150px}
+  .card .shot::after{box-shadow:inset 0 -26px 26px -14px rgba(8,16,25,.85)}
+  .card .body{padding:14px 16px 16px}
+  .card h3,.games-grid .card.big h3{font-size:1.2rem}
+}
