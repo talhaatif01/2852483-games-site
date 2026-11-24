@@ -1,3 +1,18 @@
+# tivexa.games crawler rules
+# Search engines and AI search/answer services may crawl the site so players can find our games.
+# Crawlers that collect content to train AI models are asked not to (opt-out tokens documented by their operators).
+# robots.txt is a request that well-behaved crawlers follow; it does not stop scrapers that ignore it.
+
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: Amazonbot
+Disallow: /
+
 User-agent: *
 Allow: /
 Disallow: /tiltway-prototype/
