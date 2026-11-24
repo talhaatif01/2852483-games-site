@@ -15,6 +15,5 @@ Disallow: /
 
 User-agent: *
 Allow: /
-Disallow: /tiltway-prototype/
 
 Sitemap: https://tivexa.games/sitemap.xml
